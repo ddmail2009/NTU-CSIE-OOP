@@ -32,11 +32,23 @@ public class POODirectory extends POOBoard{
 	}
 
 	public void show(){
-		System.out.printf("show.size = %d\n===================\n",getList().size());
+		System.out.printf("\n\n");
 		int size = length();
-		for(int i=0; i<size; i++)
+		for(int i=0; i<size; i++){
+			Class cls = getList().get(i).getClass();
+
+			if( cls.getName().equals("POOBoard") )System.out.printf("[b]");
+			else if( cls.getName().equals("POODirectory") )System.out.printf("[d]");
 			System.out.printf("%s\n", ((POOBoard)getList().get(i)).get_name());
-		System.out.printf("===================\nshow.finish\n");
+		}
+		System.out.printf("\n\n");
+	}
+
+	public POOBoard get( int i ){
+		if( getList().get(i).getClass().getName() == "POODirectory" ){
+			return (POODirectory)getList().get(i);	
+		}
+		else return (POOBoard)getList().get(i);
 	}
 }
 
