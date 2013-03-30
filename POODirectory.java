@@ -1,24 +1,19 @@
+import java.util.ArrayList;
+
 public class POODirectory extends POOBoard{
-	private java.util.ArrayList<POOBoard> list;
+	private ArrayList<POOBoard> list = new ArrayList<POOBoard>();
 
 	public POODirectory(String name){
 		super(name);
 	}
 
-	protected void newList(){
-		// System.out.printf("In new List\n");
-		list = new java.util.ArrayList<POOBoard>();
-	}
-
 	protected java.util.ArrayList getList(){
-		// System.out.printf("In get List\n");
 		return (java.util.ArrayList<POOBoard>)list;
 	}
 
 	//warning, doesn't check max value 1024
 	public void add(POOBoard board){
 		getList().add(board);
-		System.out.printf("list.size=%d\n", getList().size());
 	}
 	//warning, doesn't check max value 1024
 	public void add(POODirectory dir){
@@ -43,7 +38,6 @@ public class POODirectory extends POOBoard{
 			System.out.printf("%s\n", ((POOBoard)getList().get(i)).get_name());
 		System.out.printf("===================\nshow.finish\n");
 	}
-
 }
 
 class POOSplit extends POOBoard{

@@ -45,6 +45,7 @@ public class POOArticle {
 	}
 
 	public String get_name(){
+		list();
 		return title;
 	}
 }

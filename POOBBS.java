@@ -18,5 +18,8 @@ public class POOBBS{
 
 		dir.add( new POODirectory("NTU"));
 		dir.show();
+
+		dir.add( new POOArticle("a", "b", "c") );
+		dir.show();
 	}
 }
