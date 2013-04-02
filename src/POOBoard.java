@@ -9,18 +9,20 @@ public class POOBoard{
 		this.name = name;
 	}
 
-	protected java.util.ArrayList getList(){
-		return (java.util.ArrayList<POOArticle>)board;
+	protected ArrayList getList(){
+		return (ArrayList<POOArticle>)board;
 	}
 
-	//warning, doesn't check max value 1024
-	public void add(POOArticle article){
+	public boolean add(POOArticle article){
+		if( getList().size() >= MAXEVAL ) return false;
 		getList().add(article);
+		return true;
 	}
 
-	//warning, doesn't check max value 1024
-	public void del(int pos){
+	public boolean del(int pos){
+		if( pos >= MAXEVAL ) return false;
 		getList().remove(pos);
+		return true;
 	}
 	
 	public void move(int src, int dest){
@@ -35,9 +37,14 @@ public class POOBoard{
 
 	//warning, may not be right
 	public void show(){
-		int size = length();
-		for(int i=0; i<size; i++)
-			System.out.printf("%s\n", ((POOArticle)getList().get(i)).get_name());
+		int count = 0;
+		for (POOArticle i : (ArrayList<POOArticle>)getList()) {
+			count++;
+			System.out.printf("[%d] %s\n", count ,i.get_name());
+		}
+		// int size = length();
+		// for(int i=0; i<size; i++)
+			
 	}
 
 	public String get_name(){

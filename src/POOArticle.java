@@ -45,7 +45,6 @@ public class POOArticle {
 	}
 
 	public String get_name(){
-		list();
-		return title;
+		return "["+evaluation_count+"] "+author+": "+title;
 	}
 }
