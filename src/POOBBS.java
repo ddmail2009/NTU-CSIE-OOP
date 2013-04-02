@@ -1,44 +1,95 @@
 import java.util.*;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
 
-public class POOBBS{
+class CloseWindow extends WindowAdapter implements ActionListener {
+    private Window target;
+    private boolean exit;
+    public CloseWindow(Window target, boolean exit) {
+        this.target = target;
+        this.exit = exit;
+    }
+    public CloseWindow(Window target) {
+        this.target = target;
+    }
+    public void windowClosing(WindowEvent e) {
+        target.dispose();
+        if (exit) System.exit(0);
+    }
+    public void actionPerformed(ActionEvent e) {
+        target.dispose();
+        if (exit) System.exit(0);
+    }
+}
+
+public class POOBBS extends JFrame implements ActionListener {
+	private POOBBS(){
+		super("POOBBS");
+        JMenu m = new JMenu("POOBBS");
+        JMenuBar mb = new JMenuBar();
+
+        setJMenuBar(mb);
+        mb.add(m).add(new JMenuItem("Initialize")).addActionListener(this);
+
+
+        // oxBoard = new OX(this);
+        // this.getContentPane().add(oxBoard);
+        CloseWindow close = new CloseWindow(this, true);
+        m.add(new JMenuItem("Leave")).addActionListener(close);
+        this.addWindowListener(close);
+        pack();
+        setVisible(true);
+	}
+
+	public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+        if (command.equals("ABOUT")) {
+        	System.out.printf("QWE");
+        } else if (command.equals("New Game")) {
+        	System.out.printf("ASD");
+        }
+    }
+
 	public static void main(String[] args) {
+		POOBBS s = new POOBBS();
 		Scanner input = new Scanner(System.in);
+		
+		// POODirectory root = new POODirectory("favorite");
+		// // Class tmpp = root.getClass();
+		// // tmpp.show();
 
-		POODirectory root = new POODirectory("favorite");
-		// Class tmpp = root.getClass();
-		// tmpp.show();
 
+		// System.out.printf("class=%s\n",root.getClass().getName());
+		// POODirectory tmp = root;
+		// while(true){
+		// 	String classname = tmp.getClass().getName();
 
-		System.out.printf("class=%s\n",root.getClass().getName());
-		POODirectory tmp = root;
-		while(true){
-			String classname = tmp.getClass().getName();
-
-			if( classname.equals("POODirectory") ){
-				System.out.printf("0: nothing, 1: add Board, 2: add Directory, 3: add devider, 4: select board/directory? ");
-				String choice = input.nextLine();
-				if( choice.equals("0") );
-				else if( choice.equals("1") ){
-					System.out.printf("Board name: ");
-					tmp.add( new POOBoard(input.nextLine()));
-				}
-				else if( choice.equals("2") ){
-					System.out.printf("Directory name: ");
-					tmp.add( new POODirectory(input.nextLine()) );
-				}
-				else if( choice.equals("3") ){
-					tmp.add_split();
-				}
-				else if( choice.equals("4") ){
-					System.out.printf("Choose id: ");
-					tmp = (POOBoard)tmp.get(Integer.parseInt(input.nextLine()));
-				}
-			}
-			if( classname.equals("POOBoard") ){
-				System.out.printf("Board!!!\n");
-			}
-			System.out.printf("===[%s]===\n", tmp.get_name());
-			tmp.show();
-		}
+		// 	// if( classname.equals("POODirectory") ){
+		// 	// 	System.out.printf("0: nothing, 1: add Board, 2: add Directory, 3: add devider, 4: select board/directory? ");
+		// 	// 	String choice = input.nextLine();
+		// 	// 	if( choice.equals("0") );
+		// 	// 	else if( choice.equals("1") ){
+		// 	// 		System.out.printf("Board name: ");
+		// 	// 		tmp.add( new POOBoard(input.nextLine()));
+		// 	// 	}
+		// 	// 	else if( choice.equals("2") ){
+		// 	// 		System.out.printf("Directory name: ");
+		// 	// 		tmp.add( new POODirectory(input.nextLine()) );
+		// 	// 	}
+		// 	// 	else if( choice.equals("3") ){
+		// 	// 		tmp.add_split();
+		// 	// 	}
+		// 	// 	else if( choice.equals("4") ){
+		// 	// 		System.out.printf("Choose id: ");
+		// 	// 		tmp = (POOBoard)tmp.get(Integer.parseInt(input.nextLine()));
+		// 	// 	}
+		// 	// }
+		// 	// if( classname.equals("POOBoard") ){
+		// 	// 	System.out.printf("Board!!!\n");
+		// 	// }
+		// 	System.out.printf("===[%s]===\n", tmp.get_name());
+		// 	tmp.show();
+		// }
 	}
 }
