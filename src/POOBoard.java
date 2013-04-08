@@ -54,8 +54,8 @@ public class POOBoard extends POOArticle{
 		}
 	}
 
-	public void list(){
-		System.out.printf("%s", name);
+	public String get_name(){
+		return name;
 	}
 
 	public int get_size(){

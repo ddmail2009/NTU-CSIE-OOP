@@ -5,26 +5,30 @@ public class POOBBS{
 		Scanner input = new Scanner(System.in);
 
 		POOBoard board = new POOBoard("NTU");
-		board.add(new POOArticle("english is good", "eee", "wang"));
-		board.add(new POOArticle("english is best", "eee", "wang"));
-		board.add(new POOArticle("english is well", "eee", "wang"));
-		board.add(new POOArticle("english is worst", "eee", "wang"));
+		board.add(new POOArticle("ACP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+		board.add(new POOArticle("DIP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+		board.add(new POOArticle("OOP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+		board.add(new POOArticle("SP" , "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
 
 		POODirectory root = new POODirectory("Favorite");
 		((POODirectory)root).add(board);
 		((POODirectory)root).add(new POOBoard("CSIE"));
 		((POODirectory)root).add(new POODirectory("SCHOOL"));
-		// ((POODirectory)root).show();
+
 
 		int position = 0, state = 0;
 		POOArticle current = root;
 		while(true){
-			System.out.printf("Action: <g>left <h>right <j>up <k>down <a>add <m>move\n");
+			if(current.getClass().getName().equals("POODirectory"))	state = 0;
+			else if(current.getClass().getName().equals("POOBoard")) state = 1;
+			else if(current.getClass().getName().equals("POOArticle")) state = 2;
+
+			System.out.printf("Action: <g>left <h>right <j>up <k>down <a>add");
+			if (state!=2) System.out.printf("<m>move <d>delete");
+			System.out.printf("\n");
 			
 			int size = 0;
-			System.out.printf("=================");
-			current.list();
-			System.out.printf("=================\n");
+			System.out.printf("==========================%s==========================\n", current.get_name());
 			
 			if(current.getClass().getName().equals("POODirectory")){
 				size = ((POODirectory)current).get_size();
@@ -43,7 +47,7 @@ public class POOBBS{
 			}
 
 
-			String command = input.next();
+			String command = input.nextLine();
 			if (command.equals("g")) {
 				if (current != root)
 					current = current.get_parent();
@@ -63,14 +67,41 @@ public class POOBBS{
 			else if (command.equals("a")) {
 				if (state==0){
 					System.out.printf("<b> add board <d> add directory : ");
-					String type  = input.next();
+					String type  = input.nextLine();
 					System.out.printf("Name: ");
-					String name = input.next();
+					String name = input.nextLine();
 					if (type.equals("b")) ((POODirectory)current).add(new POOBoard(name));
 					else if (type.equals("d")) ((POODirectory)current).add(new POODirectory(name));
 				}
 				else if (state==1){
-					;
+					System.out.printf("Article_title: ");
+					String title = input.nextLine();
+					System.out.printf("Article_Author: ");
+					String author = input.nextLine();
+					System.out.printf("Article_Content: ");
+					String content = input.nextLine();
+					((POOBoard)current).add(new POOArticle(title, author, content));
+				}
+				else if (state==2){
+					System.out.printf("<b> Boo <p> Push <a> Arrow : ");
+					String type  = input.nextLine();
+					System.out.printf("Content: ");
+					String name = input.nextLine();
+					if (type.equals("b")) current.boo(name);
+					else if(type.equals("p")) current.push(name);
+					else if(type.equals("a")) current.arrow(name);
+				}
+			}
+			else if (command.equals("m")) {
+				if (state==0){
+					System.out.printf("Enter the position you want to move: ");
+					int p = Integer.parseInt(input.nextLine());
+					((POODirectory)current).move(position, p);
+				}
+				else if (state==1){
+					System.out.printf("Enter the position you want to move: ");
+					int p = Integer.parseInt(input.nextLine());
+					((POOBoard)current).move(position, p);	
 				}
 			}
 		}

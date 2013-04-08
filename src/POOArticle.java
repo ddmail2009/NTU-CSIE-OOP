@@ -1,4 +1,4 @@
-public class POOArticle {
+public class POOArticle implements java.io.Serializable {
 	private static int ID_count = 0;
 	private Integer ID;
 	private String title;
@@ -43,17 +43,21 @@ public class POOArticle {
 
 	public void show(){
 		list();
-		System.out.printf("%s\n", content);
+		System.out.printf("\n%s\n", content);
 		for (int i=0; i<evaluation_messages.size(); i++)
-			System.out.printf("%s\n", evaluation_messages.get(i));
+			System.out.printf("->%s\n", evaluation_messages.get(i));
 	}
 
 	public void list(){
-		System.out.printf("[%+d] ID:%d, title:%s, author:%s", evaluation_count, ID, title, author);
+		System.out.printf("[%+d]\tID:%2d\ttitle:%20s\tauthor:%20s", evaluation_count, ID, title, author);
 	}
 
 	public POOBoard get_parent(){
 		return parent;
+	}
+
+	public String get_name(){
+		return title;
 	}
 
 	public int get_size(){

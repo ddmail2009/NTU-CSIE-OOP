@@ -54,10 +54,16 @@ public class POODirectory extends POOBoard{
 
 			if( cls.getName().equals("POOBoard") )System.out.printf("[b]");
 			else if( cls.getName().equals("POODirectory") )System.out.printf("[d]");
-			tmp.list();
-			System.out.printf("\n");
+
+			System.out.printf("%s\n", tmp.get_name());
 		}
 		System.out.printf("\n");
+	}
+
+	public void move(int src, int dest){
+		POOBoard tmp = board_list.get(src);
+		board_list.set(src, board_list.get(dest));
+		board_list.set(dest, tmp);
 	}
 
 
@@ -68,8 +74,8 @@ public class POODirectory extends POOBoard{
 		else return (POOBoard)board_list.get(i);
 	}
 
-	public void list(){
-		System.out.printf("%s", name);
+	public String get_name(){
+		return name;
 	}
 
 	public POOBoard get_parent(){
