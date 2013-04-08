@@ -28,10 +28,6 @@ public class POODirectory extends POOBoard{
 		return true;
 	}
 
-	public int get_size(){
-		return board_list.size();
-	}
-
 	public void show(){
 		int size = get_size();
 		for(int i=0; i<size; i++){
@@ -71,19 +67,14 @@ public class POODirectory extends POOBoard{
 		board_list.set(dest, tmp);
 	}
 
+	public int get_size(){
+		return board_list.size();
+	}
+
 	public POOBoard get( int i ){
-		if( board_list.get(i).getClass().getName() == "POODirectory" ){
-			return (POODirectory)board_list.get(i);	
-		}
+		if( board_list.get(i).getClass().getName() == "POODirectory" )
+			return (POODirectory)board_list.get(i);
 		else return (POOBoard)board_list.get(i);
-	}
-
-	public String get_name(){
-		return name;
-	}
-
-	public POOBoard get_parent(){
-		return parent;
 	}
 }
 

@@ -30,10 +30,6 @@ public class POOBoard extends POOArticle{
 		article_list.set(dest, tmp);
 	}
 
-	public int length(){
-		return article_list.size();
-	}
-
 	public void show(){
 		int count = 0;
 		for (POOArticle i : article_list) {
