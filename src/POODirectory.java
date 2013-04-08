@@ -7,16 +7,22 @@ public class POODirectory extends POOBoard{
 		super(name);
 	}
 
-	//warning, doesn't check max value 1024
-	public void add(POOBoard board){
+	public boolean add(POOBoard board){
+		if( board_list.size() >= MAXEVAL ) return false;
 		board.parent = this;
 		board_list.add(board);
 	}
 
-	//warning, doesn't check max value 1024
 	public void add_split(){
+		if( board_list.size() >= MAXEVAL ) return false;
 		POOSplit tmp = new POOSplit();
 		board_list.add(tmp);
+	}
+	
+	public boolean del(int pos){
+		if( pos >= MAXEVAL ) return false;
+		board_list.remove(pos);
+		return true;
 	}
 
 	public void board_move(int src, int dest){
@@ -52,8 +58,8 @@ public class POODirectory extends POOBoard{
 			POOBoard tmp = board_list.get(i);
 			Class cls = tmp.getClass();
 
-			if( cls.getName().equals("POOBoard") )System.out.printf("[b]");
-			else if( cls.getName().equals("POODirectory") )System.out.printf("[d]");
+			if( cls.getName().equals("POOBoard") )System.out.printf("[b] ");
+			else if( cls.getName().equals("POODirectory") )System.out.printf("[d] ");
 
 			System.out.printf("%s\n", tmp.get_name());
 		}
@@ -61,6 +67,8 @@ public class POODirectory extends POOBoard{
 	}
 
 	public void move(int src, int dest){
+		src = src<0 ? 0 : (src>=get_size()? get_size()-1:src);
+		dest = dest<0 ? 0 : (dest>=get_size()? get_size()-1:dest);
 		POOBoard tmp = board_list.get(src);
 		board_list.set(src, board_list.get(dest));
 		board_list.set(dest, tmp);
@@ -85,6 +93,6 @@ public class POODirectory extends POOBoard{
 
 class POOSplit extends POOBoard{
 	public POOSplit(){
-		super("==========");	
+		super("==================");	
 	}
 }

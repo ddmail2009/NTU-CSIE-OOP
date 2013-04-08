@@ -31,12 +31,6 @@ public class POOBBS{
 		state = Directory;
 	}
 
-	public void PrintValidCommand(){
-		System.out.printf("Action: <g>left <h>right <j>up <k>down <a>add ");
-		if (state!=Article) System.out.printf("<m>move <d>delete");
-		System.out.printf("\n");
-	}
-
 	public void AnalyzeState(){
 		if(current.getClass().getName().equals("POODirectory")){
 			state = Directory;
@@ -50,7 +44,12 @@ public class POOBBS{
 			state = Article;
 			length = ((POOArticle)current).get_size();
 		}
+	}
 
+	public void PrintValidCommand(){
+		System.out.printf("Action: <g>left <h>right <j>up <k>down <a>add ");
+		if (state!=Article) System.out.printf("<m>move <d>delete");
+		System.out.printf("\n");
 	}
 
 	public void PrintCurrent(){
@@ -58,6 +57,18 @@ public class POOBBS{
 		if(state==Directory) ((POODirectory)current).show(position);
 		else if(state==Board) ((POOBoard)current).show(position);
 		else if(state==Article) ((POOArticle)current).show();
+	}
+
+	public void ParseCommand(String command){
+		if(command.equals("g"))ArrowKey(Left);
+		else if(command.equals("h"))ArrowKey(Right);
+		else if(command.equals("j"))ArrowKey(Up);
+		else if(command.equals("k"))ArrowKey(Down);
+		else if(command.equals("a"))AddCommand();
+		else if(state!=Article){
+			if(command.equals("m"))MoveCommand();
+			else if(command.equals("d"))DeleteCommand();
+		}
 	}
 
 	public void ArrowKey(int arrow){
@@ -71,15 +82,12 @@ public class POOBBS{
 		} 
 	}
 
-	public void ParseCommand(String command){
-		System.out.printf("current==root: %b\n", current==root);
-		if(command.equals("g"))ArrowKey(Left);
-		else if(command.equals("h"))ArrowKey(Right);
-		else if(command.equals("j"))ArrowKey(Up);
-		else if(command.equals("k"))ArrowKey(Down);
-		else if(command.equals("a"))AddCommand();
-		else if(state!=Article){
-			if(command.equals("m"))MoveCommand();
+	public void DeleteCommand(){
+		System.out.printf("Are You Sure? (y/N) ");
+		String command = input.nextLine();
+		if(!command.equals("N")){
+			if(state==Directory) ((POODirectory)current).del(position);
+			else if(state==Board) ((POOBoard)current).del(position);
 		}
 	}
 
@@ -92,12 +100,15 @@ public class POOBBS{
 
 	public void AddCommand(){
 		if (state==Directory){
-			System.out.printf("<b> add board <d> add directory : ");
+			System.out.printf("<b> add board <d> add directory <s> add split : ");
 			String type  = input.nextLine();
-			System.out.printf("Name: ");
-			String name = input.nextLine();
-			if (type.equals("b")) ((POODirectory)current).add(new POOBoard(name));
-			else if (type.equals("d")) ((POODirectory)current).add(new POODirectory(name));
+			if( !type.equals("s")){
+				System.out.printf("Name: ");
+				String name = input.nextLine();
+				if (type.equals("b")) ((POODirectory)current).add(new POOBoard(name));
+				else if (type.equals("d")) ((POODirectory)current).add(new POODirectory(name));
+			}
+			else ((POODirectory)current).add_split();
 		}
 		else if (state==Board){
 			System.out.printf("Article_title: ");
