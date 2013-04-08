@@ -11,24 +11,21 @@ public class POODirectory extends POOBoard{
 		if( board_list.size() >= MAXEVAL ) return false;
 		board.parent = this;
 		board_list.add(board);
+		return true;
 	}
 
-	public void add_split(){
+	public boolean add_split(){
 		if( board_list.size() >= MAXEVAL ) return false;
 		POOSplit tmp = new POOSplit();
+		tmp.parent = this;
 		board_list.add(tmp);
+		return true;
 	}
 	
 	public boolean del(int pos){
 		if( pos >= MAXEVAL ) return false;
 		board_list.remove(pos);
 		return true;
-	}
-
-	public void board_move(int src, int dest){
-		POOBoard tmp = board_list.get(src);
-		board_list.set(src, board_list.get(dest));
-		board_list.set(dest, tmp);
 	}
 
 	public int get_size(){
@@ -73,7 +70,6 @@ public class POODirectory extends POOBoard{
 		board_list.set(src, board_list.get(dest));
 		board_list.set(dest, tmp);
 	}
-
 
 	public POOBoard get( int i ){
 		if( board_list.get(i).getClass().getName() == "POODirectory" ){
