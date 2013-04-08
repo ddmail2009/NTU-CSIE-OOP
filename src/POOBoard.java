@@ -62,7 +62,7 @@ public class POOBoard extends POOArticle{
 		return article_list.size();
 	}
 
-	public POOArticle get_article(int i){
+	public POOArticle get(int i){
 		return article_list.get(i);
 	}
 
