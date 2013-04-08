@@ -1,53 +1,69 @@
 import java.util.ArrayList;
 
-public class POOBoard{
+public class POOBoard extends POOArticle{
 	protected static final int MAXEVAL = 1024;
 	protected String name;
-	private ArrayList<POOArticle> board = new ArrayList<POOArticle>();
+	private ArrayList<POOArticle> article_list = new ArrayList<POOArticle>();
 
 	public POOBoard(String name){
+		super();
+		parent = null;
 		this.name = name;
 	}
 
-	protected ArrayList getList(){
-		return (ArrayList<POOArticle>)board;
-	}
-
 	public boolean add(POOArticle article){
-		if( getList().size() >= MAXEVAL ) return false;
-		getList().add(article);
+		if( article_list.size() >= MAXEVAL ) return false;
+		article_list.add(article);
+		article.parent = this;
 		return true;
 	}
 
 	public boolean del(int pos){
 		if( pos >= MAXEVAL ) return false;
-		getList().remove(pos);
+		article_list.remove(pos);
 		return true;
 	}
 	
 	public void move(int src, int dest){
-		POOArticle tmp = (POOArticle)getList().get(src);
-		getList().set(src, getList().get(dest));
-		getList().set(dest, tmp);
+		POOArticle tmp = article_list.get(src);
+		article_list.set(src, article_list.get(dest));
+		article_list.set(dest, tmp);
 	}
 
 	public int length(){
-		return getList().size();
+		return article_list.size();
 	}
 
-	//warning, may not be right
 	public void show(){
 		int count = 0;
-		for (POOArticle i : (ArrayList<POOArticle>)getList()) {
+		for (POOArticle i : article_list) {
 			count++;
-			System.out.printf("[%d] %s\n", count ,i.get_name());
+			System.out.printf("[%d]", count);
+			i.list();
 		}
-		// int size = length();
-		// for(int i=0; i<size; i++)
-			
+	}
+	
+	public void show(int position){
+		int count = 0;
+		for (POOArticle i : article_list) {
+			if(count==position) System.out.printf("*  ");
+			else System.out.printf("   ");
+			i.list();
+			System.out.printf("\n");
+			count++;
+		}
 	}
 
-	public String get_name(){
-		return name;
+	public void list(){
+		System.out.printf("%s", name);
 	}
+
+	public int get_size(){
+		return article_list.size();
+	}
+
+	public POOArticle get_article(int i){
+		return article_list.get(i);
+	}
+
 }

@@ -8,12 +8,20 @@ public class POOArticle {
 	private java.util.ArrayList<String> evaluation_messages;
 	private static final int MAXEVAL = 1024;
 
+	protected POOBoard parent;
+	POOArticle(){
+		ID = -1;
+		title = author = content = "null";
+		parent = null;
+		evaluation_messages = new java.util.ArrayList<String>();
+	}
+
 	POOArticle( String title, String author, String content ){
 		ID = (ID_count++)%100;
 		this.title = title;
 		this.author = author;
 		this.content = content;
-
+		parent = null;
 		evaluation_messages = new java.util.ArrayList<String>();
 	}
 
@@ -41,10 +49,14 @@ public class POOArticle {
 	}
 
 	public void list(){
-		System.out.printf("[%+d] ID:%d, title:%s, author:%s\n", evaluation_count, ID, title, author);
+		System.out.printf("[%+d] ID:%d, title:%s, author:%s", evaluation_count, ID, title, author);
 	}
 
-	public String get_name(){
-		return "["+evaluation_count+"] "+author+": "+title;
+	public POOBoard get_parent(){
+		return parent;
+	}
+
+	public int get_size(){
+		return 0;
 	}
 }
