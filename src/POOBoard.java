@@ -1,38 +1,38 @@
 import java.util.ArrayList;
 
 public class POOBoard extends POOArticle{
-	protected static final int MAXEVAL = 1024;
-	protected String name;
-	private ArrayList<POOArticle> article_list = new ArrayList<POOArticle>();
+	protected ArrayList<POOArticle> arr_list = new ArrayList<POOArticle>();
 
-	public POOBoard(String name){
+	public POOBoard(String title){
 		super();
 		parent = null;
-		this.name = name;
+		this.title = title;
 	}
 
 	public boolean add(POOArticle article){
-		if( article_list.size() >= MAXEVAL ) return false;
-		article_list.add(article);
+		if( arr_list.size() >= MAXEVAL ) return false;
+		arr_list.add(article);
 		article.parent = this;
 		return true;
 	}
 
 	public boolean del(int pos){
 		if( pos >= MAXEVAL ) return false;
-		article_list.remove(pos);
+		arr_list.remove(pos);
 		return true;
 	}
 	
 	public void move(int src, int dest){
-		POOArticle tmp = article_list.get(src);
-		article_list.set(src, article_list.get(dest));
-		article_list.set(dest, tmp);
+		src = src<0 ? 0 : (src>=get_size() ? get_size() : src);
+		dest = dest<0 ? 0 : (dest>=get_size() ? get_size(): dest);
+		POOArticle tmp = arr_list.get(src);
+		arr_list.set(src, arr_list.get(dest));
+		arr_list.set(dest, tmp);
 	}
 
 	public void show(){
 		int count = 0;
-		for (POOArticle i : article_list) {
+		for (POOArticle i : arr_list) {
 			count++;
 			System.out.printf("[%d]", count);
 			i.list();
@@ -41,7 +41,7 @@ public class POOBoard extends POOArticle{
 	
 	public void show(int position){
 		int count = 0;
-		for (POOArticle i : article_list) {
+		for (POOArticle i : arr_list) {
 			if(count==position) System.out.printf("*  ");
 			else System.out.printf("   ");
 			i.list();
@@ -50,16 +50,12 @@ public class POOBoard extends POOArticle{
 		}
 	}
 
-	public String get_name(){
-		return name;
-	}
-
 	public int get_size(){
-		return article_list.size();
+		return arr_list.size();
 	}
 
 	public POOArticle get(int i){
-		return article_list.get(i);
+		return arr_list.get(i);
 	}
 
 }

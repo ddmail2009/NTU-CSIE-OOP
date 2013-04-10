@@ -1,19 +1,22 @@
+import java.util.ArrayList;
+
 public class POOArticle implements java.io.Serializable {
 	private static int ID_count = 0;
 	private Integer ID;
-	private String title;
 	private String author;
 	private String content;
 	private Integer evaluation_count = 0;
-	private java.util.ArrayList<String> evaluation_messages;
-	private static final int MAXEVAL = 1024;
+	protected String title;
+	private java.util.ArrayList<String> arr_list;
+
+	protected static final int MAXEVAL = 1024;
 
 	protected POOBoard parent;
 	POOArticle(){
 		ID = -1;
 		title = author = content = "null";
 		parent = null;
-		evaluation_messages = new java.util.ArrayList<String>();
+		arr_list = new java.util.ArrayList<String>();
 	}
 
 	POOArticle( String title, String author, String content ){
@@ -22,7 +25,7 @@ public class POOArticle implements java.io.Serializable {
 		this.author = author;
 		this.content = content;
 		parent = null;
-		evaluation_messages = new java.util.ArrayList<String>();
+		arr_list = new java.util.ArrayList<String>();
 	}
 
 	public boolean boo(String str){
@@ -36,16 +39,16 @@ public class POOArticle implements java.io.Serializable {
 	}
 
 	public boolean arrow(String str){
-		if (evaluation_messages.size() == MAXEVAL )return false;
-		evaluation_messages.add(str);
+		if (arr_list.size() == MAXEVAL )return false;
+		arr_list.add(str);
 		return true;
 	}
 
 	public void show(){
 		list();
 		System.out.printf("\n%s\n", content);
-		for (int i=0; i<evaluation_messages.size(); i++)
-			System.out.printf("->%s\n", evaluation_messages.get(i));
+		for (int i=0; i<get_size(); i++)
+			System.out.printf("->%s\n", arr_list.get(i));
 	}
 
 	public void list(){
@@ -61,6 +64,6 @@ public class POOArticle implements java.io.Serializable {
 	}
 
 	public int get_size(){
-		return 0;
+		return arr_list.size();
 	}
 }

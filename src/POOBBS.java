@@ -18,23 +18,38 @@ public class POOBBS{
 	public POOBBS(String str){
 		input = new Scanner(System.in);
 		root = new POODirectory(str);
+		try{
+			java.io.ObjectInputStream fileinput = new java.io.ObjectInputStream(new java.io.FileInputStream("BBS.save"));
+			root = (POOArticle)fileinput.readObject();
+			fileinput.close();
+		}catch(Exception e){
+			System.out.println(e);
 
-		POODirectory dir = new POODirectory("SCHOOL");
-		dir.add(new POOBoard("Berkely"));
-		POOBoard board = new POOBoard("CSIE");
-		board.add(new POOArticle("ACP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
-		board.add(new POOArticle("DIP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
-		board.add(new POOArticle("OOP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
-		board.add(new POOArticle("SP" , "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
-		((POODirectory)root).add(board);
-		((POODirectory)root).add(new POOBoard("EE"));
-		((POODirectory)root).add(new POOBoard("NTU"));
-		((POODirectory)root).add_split();
-		((POODirectory)root).add(dir);
+			POODirectory dir = new POODirectory("SCHOOL");
+			dir.add(new POOBoard("Berkely"));
+			POOBoard board = new POOBoard("CSIE");
+			board.add(new POOArticle("ACP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+			board.add(new POOArticle("DIP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+			board.add(new POOArticle("OOP", "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+			board.add(new POOArticle("SP" , "Wang", " template Writed by Wang\n do not worry\n this is a simple BBS demo program written in JAVA\n JAVA is a powerful programming languange\n"));
+			((POODirectory)root).add(board);
+			((POODirectory)root).add(new POOBoard("EE"));
+			((POODirectory)root).add(new POOBoard("NTU"));
+			((POODirectory)root).add_split();
+			((POODirectory)root).add(dir);
+		}
 
 		current = root;
-		
 		state = Directory;
+	}
+
+	protected void SaveBBS(){
+		System.out.printf("finalize");
+		try{
+			java.io.ObjectOutputStream output = new java.io.ObjectOutputStream(new java.io.FileOutputStream("BBS.save"));
+			output.writeObject(root);
+			output.close();
+		}catch(Exception e){;}
 	}
 
 	public void AnalyzeState(){
@@ -57,10 +72,10 @@ public class POOBBS{
 	}
 
 	public void PrintValidCommand(){
-		System.out.printf("Action: <g>left <h>right <j>up <k>down ");
+		System.out.printf("\nAction: <a>left <d>right <w>up <s>down ");
 		if (state!=Split){
-			System.out.printf("<a>add ");
-			if (state!=Article) System.out.printf("<m>move <d>delete");
+			System.out.printf("<i>insert ");
+			if (state!=Article) System.out.printf("<m>move <k>delete");
 		}
 		System.out.printf("\n");
 	}
@@ -74,25 +89,45 @@ public class POOBBS{
 	}
 
 	public void ParseCommand(String command){
-		if(command.equals("g"))ArrowKey(Left);
-		else if(command.equals("h"))ArrowKey(Right);
-		else if(command.equals("j"))ArrowKey(Up);
-		else if(command.equals("k"))ArrowKey(Down);
-		else if(command.equals("a"))AddCommand();
+		command = command.toLowerCase();
+		if(command.equals("a"))ArrowKey(Left);
+		else if(command.equals("d"))ArrowKey(Right);
+		else if(command.equals("w"))ArrowKey(Up);
+		else if(command.equals("s"))ArrowKey(Down);
+		else if(command.equals("i"))AddCommand();
 		else if(state!=Article && state!=Split){
-			if(command.equals("m"))MoveCommand();
-			else if(command.equals("d"))DeleteCommand();
+			if(command.equals("k"))DeleteCommand();
+			else if(command.equals("m"))MoveCommand();
+			else{
+				try{
+					position = Integer.parseInt(command);
+					position = position<0 ? 0 : (position>=length ? length-1 : position);
+				}catch(Exception e){
+					;
+				}
+			}
 		}
 	}
 
 	public void ArrowKey(int arrow){
 		if(arrow==Up) position = position-1<0 ? (length-1>0 ? length-1:0): position-1;
 		else if(arrow==Down) position = position+1>=length ? 0: position+1;
-		else if(arrow==Left && current != root) current = current.get_parent();
+		else if(arrow==Left){
+			if(current == root){
+				System.out.printf("Leave And Save now? (y/N) ");
+				if( input.nextLine().equals("y") ){
+					SaveBBS();
+					System.exit(1);
+				}
+			}
+			else current = current.get_parent();
+		}
 		else if(arrow==Right){
-			if(state==Directory) current = ((POODirectory)current).get(position);
-			else if(state==Board) current = ((POOBoard)current).get(position);
-			position = 0;
+			POOArticle tmp = ((POOBoard)current).get(position);
+			if( !tmp.getClass().getName().equals("POOSplit") ){
+				current = tmp;
+				position = 0;
+			}
 		} 
 	}
 
@@ -100,8 +135,8 @@ public class POOBBS{
 		System.out.printf("Are You Sure? (y/N) ");
 		String command = input.nextLine();
 		if(!command.equals("N")){
-			if(state==Directory) ((POODirectory)current).del(position);
-			else if(state==Board) ((POOBoard)current).del(position);
+			((POOBoard)current).del(position);
+			position = position<current.get_size() ? position : current.get_size()-1;
 		}
 	}
 
