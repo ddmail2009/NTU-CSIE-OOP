@@ -11,3 +11,7 @@ Homework3!!! POOBBS
 **Compile**:
 	
 	type 'make' to only Compile the POOBBS program
+
+**JavaDoc**:
+
+	type 'make doc' to make javadoc
