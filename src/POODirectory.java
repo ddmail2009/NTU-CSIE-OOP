@@ -1,10 +1,14 @@
 import java.util.ArrayList;
 
+/** Class POODirectory extends POOBoard **/
 public class POODirectory extends POOBoard{
-	public POODirectory(String name){
-		super(name);
+	/** Constructor of POODirectory
+		@param title the title of directory **/
+	public POODirectory(String title){
+		super(title);
 	}
-
+	/** Add Split line in list 
+		@return success or not **/
 	public boolean add_split(){
 		if( arr_list.size() >= MAXEVAL ) return false;
 		POOSplit tmp = new POOSplit();
@@ -12,7 +16,7 @@ public class POODirectory extends POOBoard{
 		arr_list.add(tmp);
 		return true;
 	}
-
+	/** Show the Entire List without point **/
 	public void show(){
 		int size = length();
 		for(int i=0; i<size; i++){
@@ -26,11 +30,12 @@ public class POODirectory extends POOBoard{
 		}
 		System.out.printf("\n");
 	}
-
-	public void show(int current){
+	/** Show the Entire List with point 
+		@param position the point's index **/
+	public void show(int position){
 		int size = length();
 		for(int i=0; i<size; i++){
-			if(i==current) System.out.printf("*  ");
+			if(i==position) System.out.printf("*  ");
 			else System.out.printf("   ");
 
 			POOArticle tmp = arr_list.get(i);

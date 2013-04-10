@@ -1,7 +1,9 @@
 import java.util.*;
+import java.io.*;
 
+/** Demo Class POOBBS **/
 public class POOBBS{
-	Scanner input;
+	Scanner input = new Scanner(System.in);
 	private POOArticle root, current;
 	private int state;
 	private int position = 0, length = 0;
@@ -15,14 +17,14 @@ public class POOBBS{
 	private static final int Left = 2;
 	private static final int Right = 3;
 
-	public POOBBS(String str){
-		input = new Scanner(System.in);
-		root = new POODirectory(str);
+	/** Constructor of POOBBS, Load BBS.save **/
+	public POOBBS(){
 		try{
 			LoadBBS("BBS.save");
 		}catch(Exception e){
 			System.out.println(e);
 			System.out.printf("Using Default Setting\n");
+			root = new POODirectory("Favorite");
 			POODirectory dir = new POODirectory("SCHOOL");
 			dir.add(new POOBoard("Berkely"));
 			POOBoard board = new POOBoard("CSIE");
@@ -40,20 +42,22 @@ public class POOBBS{
 		current = root;
 		state = Directory;
 	}
-
-	protected void SaveBBS(String file) throws Exception{
-		java.io.ObjectOutputStream fileoutput = new java.io.ObjectOutputStream(new java.io.FileOutputStream("BBS.save"));
+	/** Save the Current state 
+		@param file the save file name **/
+	private void SaveBBS(String file) throws Exception{
+		ObjectOutputStream fileoutput = new ObjectOutputStream(new FileOutputStream("BBS.save"));
 		fileoutput.writeObject(root);
 		fileoutput.close();
 	}
-
-	protected void LoadBBS(String file) throws Exception{
-		java.io.ObjectInputStream fileinput = new java.io.ObjectInputStream(new java.io.FileInputStream(file));
+	/** Load the state from file
+		@param file the saved file name **/
+	private void LoadBBS(String file) throws Exception{
+		ObjectInputStream fileinput = new ObjectInputStream(new FileInputStream(file));
 		root = (POOArticle)fileinput.readObject();
 		fileinput.close();
 	}
-
-	public void AnalyzeState(){
+	/** Analyze the Current State **/
+	private void AnalyzeState(){
 		if(current.getClass().getName().equals("POODirectory")){
 			state = Directory;
 			length = ((POODirectory)current).length();
@@ -67,7 +71,7 @@ public class POOBBS{
 			length = ((POOArticle)current).length();
 		}
 	}
-
+	/** Print Current Valid Command **/
 	public void PrintValidCommand(){
 		System.out.printf("\nAction: <a>left <d>right <w>up <s>down ");
 		if (state!=Split){
@@ -76,7 +80,7 @@ public class POOBBS{
 		}
 		System.out.printf("<l>leave\n");
 	}
-
+	/** Print Current Screen **/
 	public void PrintCurrent(){
 		System.out.printf("==================================%s==================================\n", current.get_name());
 		if(state==Directory) ((POODirectory)current).show(position);
@@ -84,7 +88,8 @@ public class POOBBS{
 		else if(state==Article) ((POOArticle)current).show();
 		System.out.printf("\n");
 	}
-
+	/** Parse and Operate the command
+		@param command the command **/
 	public void ParseCommand(String command){
 		command = command.toLowerCase();
 		if(command.equals("a"))ArrowKey(Left);
@@ -105,9 +110,11 @@ public class POOBBS{
 				}
 			}
 		}
+		AnalyzeState();
 	}
-
-	public void ArrowKey(int arrow){
+	/** Operate Array Key related Command 
+		@param arrow the direction **/
+	private void ArrowKey(int arrow){
 		if(arrow==Up) position = position-1<0 ? (length-1>0 ? length-1:0): position-1;
 		else if(arrow==Down) position = position+1>=length ? 0: position+1;
 		else if(arrow==Left){
@@ -122,8 +129,8 @@ public class POOBBS{
 			}
 		} 
 	}
-
-	public void DeleteCommand(){
+	/** Operate Delete Command **/
+	private void DeleteCommand(){
 		System.out.printf("Deleting position %d, Are You Sure? (y/N) ", position);
 		String command = input.nextLine();
 		if(!command.equals("N")){
@@ -131,15 +138,15 @@ public class POOBBS{
 			position = position<current.length() ? position : current.length()-1;
 		}
 	}
-
-	public void MoveCommand(){
+	/** Operate Move Command **/
+	private void MoveCommand(){
 		try{
-			System.out.printf("Enter the position you want to move: ");
+			System.out.printf("Enter the position you want to move the index to: ");
 			((POOBoard)current).move(position, Integer.parseInt(input.nextLine()));
 		}catch(Exception e){;}
 	}
-
-	public void AddCommand(){
+	/** Operate Add Command **/
+	private void AddCommand(){
 		if (state==Directory){
 			System.out.printf("<b> add board <d> add directory <s> add split : ");
 			String type  = input.nextLine();
@@ -170,8 +177,8 @@ public class POOBBS{
 			else if(type.equals("a")) current.arrow(name);
 		}
 	}
-
-	public void LeaveCommand(){
+	/** Operate Leave Command **/
+	private void LeaveCommand(){
 		System.out.printf("Leave And Save now? (y/N) ");
 		if( input.nextLine().equals("y") ){
 			try{
@@ -184,13 +191,13 @@ public class POOBBS{
 		}
 	}
 
+	/** The main method for demo **/
 	public static void main(String[] args) {
 		Scanner input = new Scanner(System.in);
-		POOBBS BBS = new POOBBS("Favorite");
+		POOBBS BBS = new POOBBS();
 		
 		int position = 0;
 		while(true){
-			BBS.AnalyzeState();
 			BBS.PrintValidCommand();
 			BBS.PrintCurrent();
 
