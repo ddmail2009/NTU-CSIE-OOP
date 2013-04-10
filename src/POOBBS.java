@@ -19,12 +19,10 @@ public class POOBBS{
 		input = new Scanner(System.in);
 		root = new POODirectory(str);
 		try{
-			java.io.ObjectInputStream fileinput = new java.io.ObjectInputStream(new java.io.FileInputStream("BBS.save"));
-			root = (POOArticle)fileinput.readObject();
-			fileinput.close();
+			LoadBBS("BBS.save");
 		}catch(Exception e){
 			System.out.println(e);
-
+			System.out.printf("Using Default Setting\n");
 			POODirectory dir = new POODirectory("SCHOOL");
 			dir.add(new POOBoard("Berkely"));
 			POOBoard board = new POOBoard("CSIE");
@@ -43,13 +41,16 @@ public class POOBBS{
 		state = Directory;
 	}
 
-	protected void SaveBBS(){
-		System.out.printf("finalize");
-		try{
-			java.io.ObjectOutputStream output = new java.io.ObjectOutputStream(new java.io.FileOutputStream("BBS.save"));
-			output.writeObject(root);
-			output.close();
-		}catch(Exception e){;}
+	protected void SaveBBS(String file) throws Exception{
+		java.io.ObjectOutputStream fileoutput = new java.io.ObjectOutputStream(new java.io.FileOutputStream("BBS.save"));
+		fileoutput.writeObject(root);
+		fileoutput.close();
+	}
+
+	protected void LoadBBS(String file) throws Exception{
+		java.io.ObjectInputStream fileinput = new java.io.ObjectInputStream(new java.io.FileInputStream(file));
+		root = (POOArticle)fileinput.readObject();
+		fileinput.close();
 	}
 
 	public void AnalyzeState(){
@@ -75,9 +76,9 @@ public class POOBBS{
 		System.out.printf("\nAction: <a>left <d>right <w>up <s>down ");
 		if (state!=Split){
 			System.out.printf("<i>insert ");
-			if (state!=Article) System.out.printf("<m>move <k>delete");
+			if (state!=Article) System.out.printf("<m>move <k>delete ");
 		}
-		System.out.printf("\n");
+		System.out.printf("<l>leave\n");
 	}
 
 	public void PrintCurrent(){
@@ -95,6 +96,7 @@ public class POOBBS{
 		else if(command.equals("w"))ArrowKey(Up);
 		else if(command.equals("s"))ArrowKey(Down);
 		else if(command.equals("i"))AddCommand();
+		else if(command.equals("l"))LeaveCommand();
 		else if(state!=Article && state!=Split){
 			if(command.equals("k"))DeleteCommand();
 			else if(command.equals("m"))MoveCommand();
@@ -113,13 +115,7 @@ public class POOBBS{
 		if(arrow==Up) position = position-1<0 ? (length-1>0 ? length-1:0): position-1;
 		else if(arrow==Down) position = position+1>=length ? 0: position+1;
 		else if(arrow==Left){
-			if(current == root){
-				System.out.printf("Leave And Save now? (y/N) ");
-				if( input.nextLine().equals("y") ){
-					SaveBBS();
-					System.exit(1);
-				}
-			}
+			if(current == root)LeaveCommand();
 			else current = current.get_parent();
 		}
 		else if(arrow==Right){
@@ -132,7 +128,7 @@ public class POOBBS{
 	}
 
 	public void DeleteCommand(){
-		System.out.printf("Are You Sure? (y/N) ");
+		System.out.printf("Deleting position %d, Are You Sure? (y/N) ", position);
 		String command = input.nextLine();
 		if(!command.equals("N")){
 			((POOBoard)current).del(position);
@@ -176,6 +172,19 @@ public class POOBBS{
 			if (type.equals("b")) current.boo(name);
 			else if(type.equals("p")) current.push(name);
 			else if(type.equals("a")) current.arrow(name);
+		}
+	}
+
+	public void LeaveCommand(){
+		System.out.printf("Leave And Save now? (y/N) ");
+		if( input.nextLine().equals("y") ){
+			try{
+				SaveBBS("BBS.save");
+				System.exit(1);
+			}catch(Exception e){
+				System.out.printf("Error Saving BBS, exit without Saving? (y/N) ");
+				if (input.nextLine().equals("y"))System.exit(1);
+			}
 		}
 	}
 

@@ -55,7 +55,8 @@ public class POOBoard extends POOArticle{
 	}
 
 	public POOArticle get(int i){
-		return arr_list.get(i);
+		if(i<get_size()) return arr_list.get(i);
+		else return this;
 	}
 
 }
