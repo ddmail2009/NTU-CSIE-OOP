@@ -14,7 +14,7 @@ public class POODirectory extends POOBoard{
 	}
 
 	public void show(){
-		int size = get_size();
+		int size = length();
 		for(int i=0; i<size; i++){
 			POOArticle tmp = arr_list.get(i);
 			Class cls = tmp.getClass();
@@ -28,7 +28,7 @@ public class POODirectory extends POOBoard{
 	}
 
 	public void show(int current){
-		int size = get_size();
+		int size = length();
 		for(int i=0; i<size; i++){
 			if(i==current) System.out.printf("*  ");
 			else System.out.printf("   ");

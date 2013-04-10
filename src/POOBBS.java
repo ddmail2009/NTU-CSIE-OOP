@@ -56,19 +56,15 @@ public class POOBBS{
 	public void AnalyzeState(){
 		if(current.getClass().getName().equals("POODirectory")){
 			state = Directory;
-			length = ((POODirectory)current).get_size();
+			length = ((POODirectory)current).length();
 		}
 		else if(current.getClass().getName().equals("POOBoard")){
 			state = Board;
-			length = ((POOBoard)current).get_size();
+			length = ((POOBoard)current).length();
 		}
 		else if(current.getClass().getName().equals("POOArticle")){
 			state = Article;
-			length = ((POOArticle)current).get_size();
-		}
-		else if(current.getClass().getName().equals("POOSplit")){
-			state = Split;
-			length = 0;
+			length = ((POOArticle)current).length();
 		}
 	}
 
@@ -132,15 +128,15 @@ public class POOBBS{
 		String command = input.nextLine();
 		if(!command.equals("N")){
 			((POOBoard)current).del(position);
-			position = position<current.get_size() ? position : current.get_size()-1;
+			position = position<current.length() ? position : current.length()-1;
 		}
 	}
 
 	public void MoveCommand(){
-		System.out.printf("Enter the position you want to move: ");
-		int p = Integer.parseInt(input.nextLine());
-		if(state==Directory) ((POODirectory)current).move(position, p);
-		else if(state==Board) ((POOBoard)current).move(position, p);	
+		try{
+			System.out.printf("Enter the position you want to move: ");
+			((POOBoard)current).move(position, Integer.parseInt(input.nextLine()));
+		}catch(Exception e){;}
 	}
 
 	public void AddCommand(){

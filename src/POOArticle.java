@@ -3,10 +3,10 @@ import java.util.ArrayList;
 public class POOArticle implements java.io.Serializable {
 	private static int ID_count = 0;
 	private Integer ID;
+	protected String title;
 	private String author;
 	private String content;
 	private Integer evaluation_count = 0;
-	protected String title;
 	private java.util.ArrayList<String> arr_list;
 
 	protected static final int MAXEVAL = 1024;
@@ -47,12 +47,12 @@ public class POOArticle implements java.io.Serializable {
 	public void show(){
 		list();
 		System.out.printf("\n%s\n", content);
-		for (int i=0; i<get_size(); i++)
+		for (int i=0; i<length(); i++)
 			System.out.printf("->%s\n", arr_list.get(i));
 	}
 
 	public void list(){
-		System.out.printf("[%+d]\tID:%2d\ttitle:%20s\tauthor:%20s", evaluation_count, ID, title, author);
+		System.out.printf("[%+5d]\tID:%2d\ttitle:%20s\tauthor:%20s", evaluation_count, ID, title, author);
 	}
 
 	public POOBoard get_parent(){
@@ -63,7 +63,7 @@ public class POOArticle implements java.io.Serializable {
 		return title;
 	}
 
-	public int get_size(){
+	public int length(){
 		return arr_list.size();
 	}
 }

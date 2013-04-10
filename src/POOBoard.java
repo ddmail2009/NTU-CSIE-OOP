@@ -23,8 +23,8 @@ public class POOBoard extends POOArticle{
 	}
 	
 	public void move(int src, int dest){
-		src = src<0 ? 0 : (src>=get_size() ? get_size() : src);
-		dest = dest<0 ? 0 : (dest>=get_size() ? get_size(): dest);
+		src = src<0 ? 0 : (src>=length() ? length() : src);
+		dest = dest<0 ? 0 : (dest>=length() ? length(): dest);
 		POOArticle tmp = arr_list.get(src);
 		arr_list.set(src, arr_list.get(dest));
 		arr_list.set(dest, tmp);
@@ -50,12 +50,12 @@ public class POOBoard extends POOArticle{
 		}
 	}
 
-	public int get_size(){
+	public int length(){
 		return arr_list.size();
 	}
 
 	public POOArticle get(int i){
-		if(i<get_size()) return arr_list.get(i);
+		if(i<length()) return arr_list.get(i);
 		else return this;
 	}
 

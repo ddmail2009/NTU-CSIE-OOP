@@ -17,6 +17,7 @@ local.properties
 .settings/
 .loadpath
 *.save
+*.docx
 
 # External tool builders
 .externalToolBuilders/
