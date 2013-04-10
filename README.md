@@ -1,12 +1,13 @@
 Object Oriented Programming
+======================================
 
-Homework3!!! 
+Homework3!!! POOBBS
+--------------------------------------
 
-POOBBS
+**Run**:
 
-===========================================
-
-
-Run:
+	type 'make run' to Run the POOBBS program
 	
-	type 'make run' to run the POOBBS program
+**Compile**:
+	
+	type 'make' to only Compile the POOBBS program
