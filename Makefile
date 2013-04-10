@@ -5,6 +5,8 @@ SOURCEFILE=$(addsuffix .java, $(FILE))
 .PHONY: all
 
 all: $(addprefix class/, $(CLASSFILE))
+	
+run: $(addprefix class/, $(CLASSFILE))
 	java -cp class POOBBS
 
 class/%.class: src/%.java
