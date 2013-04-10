@@ -19,7 +19,7 @@ local.properties
 *.save
 *.docx
 doc/
-
+hw3.pdf
 
 # External tool builders
 .externalToolBuilders/
