@@ -18,6 +18,8 @@ local.properties
 *.class
 *.doc
 *.docx
+*.jar
+hw4.pdf
 src/ntu/*
 
 # External tool builders
