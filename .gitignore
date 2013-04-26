@@ -15,6 +15,10 @@ local.properties
 .classpath
 .settings/
 .loadpath
+*.class
+*.doc
+*.docx
+src/ntu/*
 
 # External tool builders
 .externalToolBuilders/
