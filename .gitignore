@@ -20,7 +20,7 @@ local.properties
 *.docx
 *.jar
 hw4.pdf
-src/ntu/*
+ntu/*
 
 # External tool builders
 .externalToolBuilders/
