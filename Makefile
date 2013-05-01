@@ -1,9 +1,9 @@
 class_path = ntu/csie/oop13spring/
 package_name = ntu.csie.oop13spring
 
-arena = POOArenaKind
-pet = POOPetKind1 POOPetKind2
-other = POOCoordinateKind Skills
+arena = Arena
+pet = Pet_Kerrigan Pet_Foe
+other = Coordinate Skills
 allfile = $(other) $(arena) $(pet) 
 allclass = $(addsuffix .class, $(allfile))
 
