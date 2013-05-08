@@ -8,6 +8,7 @@ public class MoveState {
     public final static int STATE_LEFT = 1<<1;
     public final static int STATE_UP = 1<<2;
     public final static int STATE_DOWN = 1<<3;
+    public final static int STATE_LOCKSTOP = 1<<4;
     
     private int state = STATE_STOP;
     private int UP = KeyEvent.VK_UP;
@@ -27,19 +28,37 @@ public class MoveState {
     }
     
     public boolean isSTOP(){
-        return (state & STATE_STOP) == STATE_STOP;
+        if(isLock())return true;
+        else return (state & STATE_STOP) == STATE_STOP;
     }
     public boolean isRight(){
-        return (state & STATE_RIGHT) == STATE_RIGHT;
+        if(isLock())return false;
+        else return (state & STATE_RIGHT) == STATE_RIGHT;
     }
     public boolean isLeft(){
-        return (state & STATE_LEFT) == STATE_LEFT;
+        if(isLock())return false;
+        else return (state & STATE_LEFT) == STATE_LEFT;
     }
     public boolean isUP(){
-        return (state & STATE_UP) == STATE_UP;
+        if(isLock())return false;
+        else return (state & STATE_UP) == STATE_UP;
     }
     public boolean isDOWN(){
-        return (state & STATE_DOWN) == STATE_DOWN;
+        if(isLock())return false;
+        else return (state & STATE_DOWN) == STATE_DOWN;
+    }
+    public boolean isLock(){
+        return (state & STATE_LOCKSTOP) == STATE_LOCKSTOP;
+    }
+    public boolean setLock(boolean lock){
+        if(lock){
+            return (state |= STATE_LOCKSTOP)>0;
+        }
+        else{
+            state &= ~STATE_LOCKSTOP;
+            return true;
+        }
+        
     }
     public boolean setState(int keycode){
         int action = checkKey(keycode);
@@ -51,8 +70,11 @@ public class MoveState {
         int action = checkKey(keycode);
         if(action == STATE_STOP) return false;
         state &= ~action;
-        System.out.printf("Release key State: %d\n", keycode);
         return true;
+    }
+    public int []keyDump(){
+        int []s = {UP, RIGHT, DOWN, LEFT};
+        return s;
     }
     
     private int checkKey(int keycode){
