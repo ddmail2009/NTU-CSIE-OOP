@@ -1,29 +1,29 @@
 package ntu.csie.oop13spring;
 
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
+import java.awt.event.*;
+import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.LineBorder;
 
-public class Pet_Foe extends Arena_Pet{
+public class Pet_Isaac extends Arena_Pet{
     private BufferedImage[] images = new BufferedImage[4];
     private int CurrentDirection;
-    private HashMap<Integer, POOSkill> KeyMapping = new HashMap<>();
+    private ArrayList<TimerSkills> skilllist = new ArrayList<>();
      
-	public Pet_Foe(){
+	public Pet_Isaac(){
         super();
-		init(100, 100, 10, "Foe", new MoveState());
+		init(100, 100, 2, "Kerrigan", new MoveState(KeyEvent.VK_W, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_D));
 	}
     
     @Override
     protected void initImage(){
         String cwd = System.getProperty("user.dir")+"\\";
-        images[0] = Image.ReadImage(cwd+"Foe0.png");
-        images[1] = Image.ReadImage(cwd+"Foe1.png");
-        images[2] = Image.ReadImage(cwd+"Foe2.png");
-        images[3] = Image.ReadImage(cwd+"Foe3.png");
+        images[0] = Image.ReadImage(cwd+"Kerrigan0.png");
+        images[1] = Image.ReadImage(cwd+"Kerrigan1.png");
+        images[2] = Image.ReadImage(cwd+"Kerrigan2.png");
+        images[3] = Image.ReadImage(cwd+"Kerrigan3.png");
     }
     
     @Override
@@ -33,49 +33,53 @@ public class Pet_Foe extends Arena_Pet{
         setAGI(AGI);
         setName(str);
         this.movestate = movestate;
+    }
+    
+    Skills getSkills(int keycode){
+        for(int i: movestate.keyDump())
+            if(i == keycode || i == -keycode) return new Move();
         
-        KeyMapping.put(KeyEvent.VK_NUMPAD4, new Attack());
-        KeyMapping.put(KeyEvent.VK_NUMPAD5, new Guard());
-        KeyMapping.put(-KeyEvent.VK_NUMPAD5, new UnGuard());
-        for (int i : movestate.keyDump()) {
-            KeyMapping.put(i, new Move());
-            KeyMapping.put(-i, new Move());
+        switch(keycode){
+            case KeyEvent.VK_Q: return new Attack();
+            case KeyEvent.VK_SPACE: return new Guard();
+            case -KeyEvent.VK_SPACE: return new UnGuard();
         }
+        
+        return null;
     }
 
     @Override
     public void setMovestate(MoveState movestate){
         this.movestate = movestate;
     }
+    private int regeneration = 0;
     
     @Override
 	protected POOAction act(POOArena oldarena){
+        regeneration = (regeneration + 1)%1000;
+        if(regeneration == 0) setMP(getMP() < 100 ? getMP()+1 : 100);
+        
         Arena arena = (Arena)oldarena;
         ArrayList<Integer> keys = arena.petGetKey(this);
         try{
             int key = keys.get(0);
-            if(KeyMapping.get(key) == null){
+            if(getSkills(key) == null){
                 keys.remove(0);
                 return null;
             }
-            else if(!(KeyMapping.get(key) instanceof Move)){
+            else if(!(getSkills(key) instanceof Move)){
                 keys.remove(0);
-                if(Actionlock.isLock() == false){
-                    POOAction e = new POOAction();
-                    e.skill = new NULL_SKILL();
-                    e.dest = null;
+                
+                POOAction e = new POOAction();
+                e.skill = getSkills(key);
+                e.dest = null;
 
-                    e.skill = KeyMapping.get(key);
-                    e.dest = null;
-
-                    ((Skills)e.skill).require(this);
-                    if(e.skill instanceof TimerSkills){
-                         Actionlock = (TimerSkills)e.skill;
-                         ((TimerSkills)e.skill).startTimer(arena);
-                    }
-                    return e;
+                ((Skills)e.skill).require(this);
+                if(e.skill instanceof TimerSkills){
+                     skilllist.add(((TimerSkills)e.skill));
+                     ((TimerSkills)e.skill).startTimer(arena);
                 }
-                else return null;
+                return e;
             }
         }catch(Exception e){}
         return null;
@@ -87,8 +91,8 @@ public class Pet_Foe extends Arena_Pet{
         ArrayList<Integer> keys = arena.petGetKey(this);
         try{
             int key = keys.get(0);
-            if(KeyMapping.get(key) == null) keys.remove(0);
-            else if(KeyMapping.get(key) instanceof Move){
+            if(getSkills(key) == null ) keys.remove(0);
+            else if(getSkills(key) instanceof Move){
                 keys.remove(0);
                 if(key > 0 && movestate.setState(key));
                 else if(key < 0 && movestate.delState(-key));
@@ -98,10 +102,10 @@ public class Pet_Foe extends Arena_Pet{
         }
         
         POOCoordinate coor = comp.getCoor();
-        if(movestate.isDOWN()) coor.x++;
-        if(movestate.isUP()) coor.x--;
-        if(movestate.isRight()) coor.y++;
-        if(movestate.isLeft()) coor.y--;
+        if(movestate.isDOWN()) coor.x += getAGI();
+        if(movestate.isUP()) coor.x -= getAGI();
+        if(movestate.isRight()) coor.y += getAGI();
+        if(movestate.isLeft()) coor.y -= getAGI();
         comp.setCoor(coor);
         
         if(movestate.isDOWN()) SetCurrentDirection(MoveState.STATE_DOWN);
@@ -130,7 +134,7 @@ public class Pet_Foe extends Arena_Pet{
 
     @Override
     protected void initComp(Container container) {
-        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/2, container.getSize().width*3/4);
+        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/2, container.getSize().width/4);
         comp.setLimit(new Rectangle(new Point(0, 0), container.getSize()));
     }
 
@@ -154,7 +158,7 @@ public class Pet_Foe extends Arena_Pet{
         
         JPanel mp_back = new JPanel();
         mp_back.setBackground(Color.blue);
-        
+  
         statcomp.add(new MyComp(container, hp, height*1/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, mp, height*3/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, hp_back, height*1/5, width*7/20, width*6/10, height/5));
@@ -165,10 +169,18 @@ public class Pet_Foe extends Arena_Pet{
     @Override
     public void draw(Arena arena) {
         comp.draw();
+        
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);
-        for (MyComp myComp : statcomp) {
+        
+        for (MyComp myComp : statcomp)
             myComp.draw();
+        
+        Object []tmp = skilllist.toArray();
+        for(int i=0; i<tmp.length; i++){
+            int a = ((TimerSkills)tmp[i]).update(this, arena);
+            if(a == -1)
+                skilllist.remove(tmp[i]);
         }
     }
 }

@@ -1,10 +1,11 @@
 package ntu.csie.oop13spring;
 
 import java.awt.Container;
+import java.util.ArrayList;
 
 public abstract class Arena_Pet extends POOPet {
     protected MyComp comp;
-    protected MyComp statcomp;
+    protected ArrayList<MyComp> statcomp = new ArrayList<>();
     protected MoveState movestate = new MoveState();
     protected TimerSkills Actionlock = new Attack();
     
@@ -15,7 +16,7 @@ public abstract class Arena_Pet extends POOPet {
     public abstract void setMovestate(MoveState movestate);
     public abstract int GetCurrentDirection();
     public abstract void SetCurrentDirection(int direction);
-    public abstract void draw();
+    public abstract void draw(Arena arena);
     
     public MyComp getComp(){
         return comp;

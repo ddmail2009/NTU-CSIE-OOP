@@ -1,9 +1,11 @@
 package ntu.csie.oop13spring;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit.*;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Point;
+import java.util.ArrayList;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public abstract class Skills extends POOSkill{
     private String name, description;
@@ -28,14 +30,19 @@ public abstract class Skills extends POOSkill{
 }
 
  abstract class TimerSkills extends Skills{
-    protected Object lock;
+    protected boolean lock;
+    
+    public void setLock(boolean lock){
+        this.lock = lock;
+    }
     public TimerSkills(String str, String des){
         super(str, des);
     }
-    public boolean isFinished(){
-        return lock == null;
+    public boolean isLock(){
+        return lock;
     }
     public abstract void startTimer(POOArena arena);
+    public abstract int update(final POOPet pet, Arena arena);
 }
 
 class ArcaneStorm extends Skills{
@@ -60,11 +67,14 @@ class ArcaneStorm extends Skills{
 }
 
 
+
+
 class Attack extends TimerSkills{
     private int Direction;
     private POOCoordinate coor;
     private Arena_Pet npet;
-    ScheduledExecutorService timer = Executors.newScheduledThreadPool(1);
+    private MyComp comp;
+    private boolean hit = false;
     
 	Attack(){
 		super("Attack", "Damage Foe 1 HP");
@@ -80,57 +90,76 @@ class Attack extends TimerSkills{
 		return true;
 	}
     @Override
-	protected POOPet targetcheck(POOArena arena){
-        Coordinate tmp = new Coordinate(coor);
-        if(Direction == MoveState.STATE_DOWN) tmp.x += 50*MyComp.ratio;
-        else if(Direction == MoveState.STATE_UP) tmp.x -= 50*MyComp.ratio;
-        else if(Direction == MoveState.STATE_LEFT) tmp.y -= 50*MyComp.ratio;
-        else tmp.y += 50*MyComp.ratio;
-        
-        POOPet []parr = arena.getAllPets();
-        for (int i = 0; i < parr.length; i++) {
-            POOCoordinate t = arena.getPosition(parr[i]);
-            if(parr[i]!=npet){
-                if( coor.x != tmp.x && INSIDE(tmp.x, t.x, coor.x) )return parr[i];
-                else if(coor.y != tmp.y && INSIDE(tmp.y, t.y, coor.y)) return parr[i];
-            }
-        }
-        return null;
-	}
-    
-    
-    @Override
 	public void act(POOPet pet){
+        System.out.printf("hit pet %s\n", pet.getName());
 		pet.setHP(pet.getHP()-1);
 	}
+    
+    private int count = 0;
+    
+    protected void obj_init(final POOArena arena){
+        Dimension size = npet.comp.getComp().getSize();
+        Point objoffset = new Point();
+        Dimension objSize = new Dimension(10, 5);
+        
+        if(Direction == MoveState.STATE_DOWN) objoffset = new Point(npet.comp.getActualCoor().x + size.height, npet.comp.getActualCoor().y + size.width/2);
+        else if(Direction == MoveState.STATE_UP) objoffset = new Point(npet.comp.getActualCoor().x, npet.comp.getActualCoor().y + size.width/2);
+        else if(Direction == MoveState.STATE_LEFT) objoffset = new Point(npet.comp.getActualCoor().x + size.height/2, npet.comp.getActualCoor().y);
+        else if(Direction == MoveState.STATE_RIGHT)objoffset = new Point(npet.comp.getActualCoor().x + size.height/2, npet.comp.getActualCoor().y + size.width);
+            
+        if(Direction == MoveState.STATE_LEFT || Direction == MoveState.STATE_RIGHT) objSize = new Dimension(5, 10);
+        
+        comp = new MyComp(npet.comp.getComp().getParent(), new JLabel("english"), objoffset.x, objoffset.y, objSize.height, objSize.width);
+        comp.getComp().setBorder(new LineBorder(Color.black));
+        comp.getComp().setBackground(Color.red);
+    }
+    
+    public void startTimer(final POOArena arena){
+        obj_init(arena);
+        count = 0;
+    }
+    
+    public int update(POOPet pet, Arena arena){
+        count ++;
+       
+        POOCoordinate coorr = comp.getCoor();
+        if(Direction == MoveState.STATE_DOWN) coorr.x += 5;
+        else if(Direction == MoveState.STATE_UP) coorr.x -= 5;
+        else if(Direction == MoveState.STATE_LEFT) coorr.y -= 5;
+        else coorr.y += 5;
+        comp.setCoor(coorr);
+        comp.draw();
+
+        ArrayList<Arena_Pet> blocklist = new ArrayList<>();
+        blocklist.add(npet);
+        
+        POOPet tmp = null;
+        int index = ((Arena)arena).searchBlockPosition(comp.getComp().getBounds(), blocklist);
+        if(index >= 0) tmp = arena.getAllPets()[index];
+        
+        if(tmp != null){
+            System.out.printf("%s attacked %s\n", npet.getName(), tmp.getName());
+            act(tmp);
+        }
+        
+        if(tmp != null || count > 1*100000){
+            comp.getComp().setVisible(false);
+            comp.getComp().getParent().remove(comp.getComp());
+            
+            return -1;
+        }
+        return 0;
+    }
+
     @Override
-    public void startTimer(final POOArena arena) {
-        System.out.println("StartTimer\n");
-        lock = new Object();
-        final Runnable beeper = new Runnable() {
-            @Override
-            public void run() {
-                POOPet tmp = targetcheck(arena);
-                if(tmp != null){
-                    System.out.printf("%s attacked %s\n", npet.getName(), tmp.getName());
-                    act(tmp);
-                }
-            }
-        };
-        final ScheduledFuture beeperHandler = timer.scheduleAtFixedRate(beeper, 0, 500, java.util.concurrent.TimeUnit.MILLISECONDS);
-        timer.schedule(new Runnable() {
-            @Override
-            public void run() {
-                beeperHandler.cancel(true);
-                lock = null;
-            }
-        }, 1, java.util.concurrent.TimeUnit.SECONDS);
+    protected POOPet targetcheck(POOArena arena) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 }
 
 class Move extends Skills{
     Move(){
-        super("Move Right", "Move right and restore 1 MP");
+        super("Move", "");
     }
     Move(String str, String Des){
 		super(str, Des);

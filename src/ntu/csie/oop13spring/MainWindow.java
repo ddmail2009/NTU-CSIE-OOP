@@ -2,7 +2,6 @@ package ntu.csie.oop13spring;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import javax.swing.JPanel;
 
 public class MainWindow extends javax.swing.JFrame {
@@ -57,7 +56,7 @@ public class MainWindow extends javax.swing.JFrame {
         Main_Panel.setLayout(null);
 
         Stat_Panel.setBackground(new java.awt.Color(153, 153, 255));
-        Stat_Panel.setPreferredSize(new java.awt.Dimension(800, 100));
+        Stat_Panel.setPreferredSize(new java.awt.Dimension(1000, 100));
         Stat_Panel.setLayout(new java.awt.GridLayout(1, 8));
 
         P1_Stat_Panel.setBackground(Stat_Panel.getBackground());
@@ -71,7 +70,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P1_Stat_PanelLayout.setVerticalGroup(
             P1_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P1_Stat_Panel);
@@ -87,7 +86,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P2_Stat_PanelLayout.setVerticalGroup(
             P2_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P2_Stat_Panel);
@@ -103,7 +102,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P3_Stat_PanelLayout.setVerticalGroup(
             P3_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P3_Stat_Panel);
@@ -119,7 +118,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P4_Stat_PanelLayout.setVerticalGroup(
             P4_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P4_Stat_Panel);
@@ -135,7 +134,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P5_Stat_PanelLayout.setVerticalGroup(
             P5_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P5_Stat_Panel);
@@ -151,7 +150,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P6_Stat_PanelLayout.setVerticalGroup(
             P6_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P6_Stat_Panel);
@@ -167,7 +166,7 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P7_Stat_PanelLayout.setVerticalGroup(
             P7_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P7_Stat_Panel);
@@ -183,17 +182,18 @@ public class MainWindow extends javax.swing.JFrame {
         );
         P8_Stat_PanelLayout.setVerticalGroup(
             P8_Stat_PanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 89, Short.MAX_VALUE)
+            .addGap(0, 59, Short.MAX_VALUE)
         );
 
         Stat_Panel.add(P8_Stat_Panel);
 
         Main_Panel.add(Stat_Panel);
-        Stat_Panel.setBounds(0, 1, 1000, 90);
+        Stat_Panel.setBounds(0, 1, 1000, 60);
 
         Combat_Panel.setBackground(new java.awt.Color(0, 204, 204));
+        Combat_Panel.setLayout(null);
         Main_Panel.add(Combat_Panel);
-        Combat_Panel.setBounds(0, 90, 1000, 460);
+        Combat_Panel.setBounds(0, 60, 1000, 490);
 
         getContentPane().add(Main_Panel, java.awt.BorderLayout.CENTER);
         Main_Panel.getAccessibleContext().setAccessibleDescription("");
