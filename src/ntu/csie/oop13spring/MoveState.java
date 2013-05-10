@@ -27,25 +27,25 @@ public class MoveState {
         this.RIGHT = RIGHT;
     }
     
-    public boolean isSTOP(){
-        if(isLock())return true;
-        else return (state & STATE_STOP) == STATE_STOP;
-    }
-    public boolean isRight(){
+    public boolean isRight(int key){
         if(isLock())return false;
-        else return (state & STATE_RIGHT) == STATE_RIGHT;
+        else if(key == RIGHT)return true;
+        else return false;
     }
-    public boolean isLeft(){
+    public boolean isLeft(int key){
         if(isLock())return false;
-        else return (state & STATE_LEFT) == STATE_LEFT;
+        else if(key == LEFT)return true;
+        else return false;
     }
-    public boolean isUP(){
+    public boolean isUP(int key){
         if(isLock())return false;
-        else return (state & STATE_UP) == STATE_UP;
+        else if(key == UP)return true;
+        else return false;
     }
-    public boolean isDOWN(){
+    public boolean isDOWN(int key){
         if(isLock())return false;
-        else return (state & STATE_DOWN) == STATE_DOWN;
+        else if(key == DOWN)return true;
+        else return false;
     }
     public boolean isLock(){
         return (state & STATE_LOCKSTOP) == STATE_LOCKSTOP;
@@ -60,28 +60,8 @@ public class MoveState {
         }
         
     }
-    public boolean setState(int keycode){
-        int action = checkKey(keycode);
-        if(action == STATE_STOP) return false;
-        state |= action;
-        return true;
-    }
-    public boolean delState(int keycode){
-        int action = checkKey(keycode);
-        if(action == STATE_STOP) return false;
-        state &= ~action;
-        return true;
-    }
     public int []keyDump(){
         int []s = {UP, RIGHT, DOWN, LEFT};
         return s;
-    }
-    
-    private int checkKey(int keycode){
-        if(keycode == UP) return STATE_UP;
-        else if(keycode == DOWN) return STATE_DOWN;
-        else if(keycode == LEFT) return STATE_LEFT;
-        else if(keycode == RIGHT) return STATE_RIGHT;
-        else return STATE_STOP;
     }
 }

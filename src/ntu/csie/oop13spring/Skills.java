@@ -66,15 +66,19 @@ class ArcaneStorm extends Skills{
 	}
 }
 
-
-
-
 class Attack extends TimerSkills{
     private int Direction;
-    private POOCoordinate coor;
     private Arena_Pet npet;
     private MyComp comp;
     private boolean hit = false;
+    private Count_Task count = new Count_Task(20) {
+        @Override
+        public int task() {
+            comp.getComp().setVisible(false);
+            comp.getComp().getParent().remove(comp.getComp());
+            return 20;
+        }
+    };
     
 	Attack(){
 		super("Attack", "Damage Foe 1 HP");
@@ -86,8 +90,7 @@ class Attack extends TimerSkills{
 	protected boolean require(POOPet pet){
         npet = (Arena_Pet)pet;
         Direction = ((Arena_Pet)pet).GetCurrentDirection();
-        coor = npet.comp.getCoor();
-		return true;
+        return pet.setMP(pet.getMP()-1);
 	}
     @Override
 	public void act(POOPet pet){
@@ -95,33 +98,29 @@ class Attack extends TimerSkills{
 		pet.setHP(pet.getHP()-1);
 	}
     
-    private int count = 0;
-    
     protected void obj_init(final POOArena arena){
         Dimension size = npet.comp.getComp().getSize();
         Point objoffset = new Point();
         Dimension objSize = new Dimension(10, 5);
         
-        if(Direction == MoveState.STATE_DOWN) objoffset = new Point(npet.comp.getActualCoor().x + size.height, npet.comp.getActualCoor().y + size.width/2);
-        else if(Direction == MoveState.STATE_UP) objoffset = new Point(npet.comp.getActualCoor().x, npet.comp.getActualCoor().y + size.width/2);
-        else if(Direction == MoveState.STATE_LEFT) objoffset = new Point(npet.comp.getActualCoor().x + size.height/2, npet.comp.getActualCoor().y);
-        else if(Direction == MoveState.STATE_RIGHT)objoffset = new Point(npet.comp.getActualCoor().x + size.height/2, npet.comp.getActualCoor().y + size.width);
+        if(Direction == MoveState.STATE_DOWN) objoffset = new Point(npet.comp.getCoor().x + size.height, npet.comp.getCoor().y + size.width/2);
+        else if(Direction == MoveState.STATE_UP) objoffset = new Point(npet.comp.getCoor().x, npet.comp.getCoor().y + size.width/2);
+        else if(Direction == MoveState.STATE_LEFT) objoffset = new Point(npet.comp.getCoor().x + size.height/2, npet.comp.getCoor().y);
+        else if(Direction == MoveState.STATE_RIGHT)objoffset = new Point(npet.comp.getCoor().x + size.height/2, npet.comp.getCoor().y + size.width);
             
         if(Direction == MoveState.STATE_LEFT || Direction == MoveState.STATE_RIGHT) objSize = new Dimension(5, 10);
         
-        comp = new MyComp(npet.comp.getComp().getParent(), new JLabel("english"), objoffset.x, objoffset.y, objSize.height, objSize.width);
+        comp = new MyComp(npet.comp.getComp().getParent(), new JPanel(), objoffset.x, objoffset.y, objSize.height, objSize.width);
         comp.getComp().setBorder(new LineBorder(Color.black));
         comp.getComp().setBackground(Color.red);
     }
     
     public void startTimer(final POOArena arena){
         obj_init(arena);
-        count = 0;
+        comp.getComp().setVisible(false);
     }
     
-    public int update(POOPet pet, Arena arena){
-        count ++;
-       
+    public int update(POOPet pet, Arena arena){       
         POOCoordinate coorr = comp.getCoor();
         if(Direction == MoveState.STATE_DOWN) coorr.x += 5;
         else if(Direction == MoveState.STATE_UP) coorr.x -= 5;
@@ -140,17 +139,16 @@ class Attack extends TimerSkills{
         if(tmp != null){
             System.out.printf("%s attacked %s\n", npet.getName(), tmp.getName());
             act(tmp);
-        }
-        
-        if(tmp != null || count > 1*100000){
             comp.getComp().setVisible(false);
             comp.getComp().getParent().remove(comp.getComp());
-            
+        }
+        
+        
+        if( tmp != null || count.run() == 20 ){
             return -1;
         }
         return 0;
     }
-
     @Override
     protected POOPet targetcheck(POOArena arena) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
