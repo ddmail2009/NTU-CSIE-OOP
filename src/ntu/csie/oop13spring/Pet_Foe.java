@@ -8,10 +8,9 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 public class Pet_Foe extends Arena_Pet{
-    private BufferedImage[] images = new BufferedImage[4];
-    private int CurrentDirection;
-    private ArrayList<TimerSkills> skilllist = new ArrayList<>();
-    Count_Task mp_regeneration = new Count_Task(60) {
+    private BufferedImage []images;
+    
+    Count_Task mp_regeneration = new Count_Task(10) {
         @Override
         public int task() {
             return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
@@ -20,16 +19,16 @@ public class Pet_Foe extends Arena_Pet{
      
 	public Pet_Foe(){
         super();
-		init(100, 100, 2, "Foe", new MoveState());
+		init(100, 100, 3, "Foe", new MoveState());
 	}
     
     @Override
     protected void initImage(){
-        String cwd = System.getProperty("user.dir")+"\\";
-        images[0] = Image.ReadImage(cwd+"Foe0.png");
-        images[1] = Image.ReadImage(cwd+"Foe1.png");
-        images[2] = Image.ReadImage(cwd+"Foe2.png");
-        images[3] = Image.ReadImage(cwd+"Foe3.png");
+        images = new BufferedImage[3];
+        for(int i=0; i<3; i++){
+            String a = String.format("%sFoe%d.png", POOUtil.getCWD()+"images/", i+1);
+            images[i] = POOUtil.getImage(a);
+        }
     }
     
     @Override
@@ -44,16 +43,28 @@ public class Pet_Foe extends Arena_Pet{
     private Skills getSkills(int keycode){
         for(int i: movestate.keyDump())
             if(i == keycode || i == -keycode) return new Move();
-        
         switch(keycode){
             case KeyEvent.VK_P: return new Attack();
             case KeyEvent.VK_O: return new Guard();
-            case -KeyEvent.VK_I: return new UnGuard();
+            case KeyEvent.VK_SHIFT: return new Jump();
+            case KeyEvent.VK_0: return new MissleAttack();
         }
         
         return null;
     }
 
+    private Skills getComboSkills(ArrayList<Integer> recentKey){
+//        int []a = {KeyEvent.VK_SPACE, KeyEvent.VK_D, KeyEvent.VK_SPACE};
+//        for(int i=0; i<recentKey.size(); i++){
+//            int match = 0;
+//            for(int j=0; j<3; j++){
+//                if(recentKey.get(i) == a[i]) match += 1;
+//            }
+//            if(match == 3) return new MissleAttack();
+//        }
+        return null;
+    }
+    
     @Override
     public void setMovestate(MoveState movestate){
         this.movestate = movestate;
@@ -64,31 +75,25 @@ public class Pet_Foe extends Arena_Pet{
         mp_regeneration.run();
         
         Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.petGetKey(this);
+        HashSet<Integer> keys = arena.getKey();
         try{
-//            int key = keys.get(0);
-//            if(getSkills(key) == null){
-//                keys.remove(0);
-//                return null;
-//            }
-//            else if(!(getSkills(key) instanceof Move)){
-//                keys.remove(0);
             int key = 0;
             for (Integer integer : keys) {
-                if( !(getSkills(integer) instanceof Move) )key = integer;
+                if( getSkills(integer) != null && !(getSkills(integer) instanceof Move) )key = integer;
             }
-                
-                POOAction e = new POOAction();
-                e.skill = getSkills(key);
-                e.dest = null;
-
-                ((Skills)e.skill).require(this);
+            
+            POOAction e = new POOAction();
+            e.skill = getSkills(key);
+            e.dest = null;
+            
+            if( ((Skills)e.skill).require(this) ){;
                 if(e.skill instanceof TimerSkills){
                      skilllist.add(((TimerSkills)e.skill));
                      ((TimerSkills)e.skill).startTimer(arena);
                 }
-                return e;
-//            }
+            }
+            else e.skill = null;
+            return e;
         }catch(Exception e){}
         return null;
 	}
@@ -96,57 +101,53 @@ public class Pet_Foe extends Arena_Pet{
     @Override
 	protected POOCoordinate move(POOArena oldarena){
         Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.petGetKey(this);
+        HashSet<Integer> keys = arena.getKey();
+        if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
+        
         try{
             int key = 0;
             for (Integer integer : keys) {
-                if(getSkills(integer) instanceof Move) key = integer;
+                if(getSkills(integer) instanceof Move) {
+                    key = integer;
+                    
+                    POOCoordinate coor = comp.getCoor();
+                    if(movestate.isDOWN(key)) coor.x += getAGI();
+                    if(movestate.isUP(key)) coor.x -= getAGI();
+                    if(movestate.isRight(key)) coor.y += getAGI();
+                    if(movestate.isLeft(key)) coor.y -= getAGI();
+                    comp.setCoor(coor);
+                }
             }
-//            int key = keys.get(0);
-//            if(getSkills(key) == null) keys.remove(0);
-//            else if(getSkills(key) instanceof Move){
-//                keys.remove(0);
-
-                POOCoordinate coor = comp.getCoor();
-                if(movestate.isDOWN(key)) coor.x += getAGI();
-                else if(movestate.isUP(key)) coor.x -= getAGI();
-                if(movestate.isRight(key)) coor.y += getAGI();
-                else if(movestate.isLeft(key)) coor.y -= getAGI();
-                comp.setCoor(coor);
-
-//                if(movestate.isDOWN(key)) SetCurrentDirection(MoveState.STATE_DOWN);
-//                else if(movestate.isUP(key)) SetCurrentDirection(MoveState.STATE_UP);
-//                else if(movestate.isRight(key)) SetCurrentDirection(MoveState.STATE_RIGHT);
-//                else if(movestate.isLeft(key)) SetCurrentDirection(MoveState.STATE_LEFT);
-//            }
+            
+            if(movestate.isDOWN(key)) SetCurrentDirection(POOConstant.STAT_DOWN);
+            else if(movestate.isUP(key)) SetCurrentDirection(POOConstant.STAT_UP);
+            else if(movestate.isRight(key)) SetCurrentDirection(POOConstant.STAT_RIGHT);
+            else if(movestate.isLeft(key)) SetCurrentDirection(POOConstant.STAT_LEFT);
         }catch(Exception e){
             ;
         }
-        
-        
 		return null;
 	}
     
     @Override
     public int GetCurrentDirection(){
-        return CurrentDirection;
+        return POOUtil.getDirection(State);
     }
     
     @Override
     public void SetCurrentDirection(int direction){
-        if(CurrentDirection != direction){
-            CurrentDirection = direction;
-            if(direction == MoveState.STATE_LEFT) ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[3]));
-            else if(direction == MoveState.STATE_RIGHT) ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[1]));
-            else if(direction == MoveState.STATE_UP) ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[2]));
-            else if(direction == MoveState.STATE_DOWN) ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[0]));
-            else ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[0]));
+        if(!POOUtil.isStatus(State, direction)){
+            State = POOUtil.delStatus(State, POOConstant.STAT_DOWN);
+            State = POOUtil.delStatus(State, POOConstant.STAT_UP);
+            State = POOUtil.delStatus(State, POOConstant.STAT_LEFT);
+            State = POOUtil.delStatus(State, POOConstant.STAT_RIGHT);
+            State = POOUtil.setStatus(State, direction);
         }
     }
 
     @Override
     protected void initComp(Container container) {
-        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/2, container.getSize().width*3/4);
+        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/2, container.getSize().width/4);
         comp.setLimit(new Rectangle(new Point(0, 0), container.getSize()));
     }
 
@@ -175,11 +176,14 @@ public class Pet_Foe extends Arena_Pet{
         statcomp.add(new MyComp(container, mp, height*3/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, hp_back, height*1/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, mp_back, height*3/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, new JLabel(new ImageIcon(images[0])), height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
+        statcomp.add(new MyComp(container, label, height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
     }
 
+    int image_count = 0;
     @Override
     public void draw(Arena arena) {
+        image_count = (image_count+1)%(images.length*10);
+        ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[image_count/10]));
         comp.draw();
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
@@ -188,11 +192,11 @@ public class Pet_Foe extends Arena_Pet{
         for (MyComp myComp : statcomp)
             myComp.draw();
         
-        Object []tmp = skilllist.toArray();
-        for(int i=0; i<tmp.length; i++){
-            int a = ((TimerSkills)tmp[i]).update(this, arena);
-            if(a == -1)
-                skilllist.remove(tmp[i]);
+        ArrayList<TimerSkills> remove_todo = new ArrayList<>();
+        for (TimerSkills timerSkills : skilllist) 
+            if(timerSkills.update(this, arena) == -1) remove_todo.add(timerSkills);
+        for (TimerSkills timerSkills : remove_todo) {
+            skilllist.remove(timerSkills);
         }
     }
 }

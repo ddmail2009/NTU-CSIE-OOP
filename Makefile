@@ -2,7 +2,7 @@ class_path = ntu/csie/oop13spring/
 package_name = ntu.csie.oop13spring
 
 arena = Arena
-pet = Pet_Kerrigan Pet_Foe
+pet = Pet_Isaac Pet_Foe
 other = Coordinate Skills
 allfile = $(other) $(arena) $(pet) 
 allclass = $(addsuffix .class, $(allfile))

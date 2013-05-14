@@ -2,15 +2,8 @@ package ntu.csie.oop13spring;
 
 import java.awt.event.KeyEvent;
 
-public class MoveState {
-    public final static int STATE_STOP = 0;
-    public final static int STATE_RIGHT = 1;
-    public final static int STATE_LEFT = 1<<1;
-    public final static int STATE_UP = 1<<2;
-    public final static int STATE_DOWN = 1<<3;
-    public final static int STATE_LOCKSTOP = 1<<4;
-    
-    private int state = STATE_STOP;
+public class MoveState {    
+    private int state = POOConstant.STAT_STOP;
     private int UP = KeyEvent.VK_UP;
     private int DOWN = KeyEvent.VK_DOWN;
     private int LEFT = KeyEvent.VK_LEFT;
@@ -48,17 +41,12 @@ public class MoveState {
         else return false;
     }
     public boolean isLock(){
-        return (state & STATE_LOCKSTOP) == STATE_LOCKSTOP;
+        return POOUtil.isStatus(state, POOConstant.STAT_LOCK);
     }
     public boolean setLock(boolean lock){
-        if(lock){
-            return (state |= STATE_LOCKSTOP)>0;
-        }
-        else{
-            state &= ~STATE_LOCKSTOP;
-            return true;
-        }
-        
+        if(lock) state = POOUtil.setStatus(state, POOConstant.STAT_LOCK);
+        else state = POOUtil.delStatus(state, POOConstant.STAT_LOCK);
+        return lock;
     }
     public int []keyDump(){
         int []s = {UP, RIGHT, DOWN, LEFT};

@@ -8,12 +8,11 @@ import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 public class Pet_Isaac extends Arena_Pet{
-    private BufferedImage[] images = new BufferedImage[4];
-    private int CurrentDirection;
-    private ArrayList<TimerSkills> skilllist = new ArrayList<>();
-    Count_Task mp_regeneration = new Count_Task(30) {
+    private BufferedImage []images;
+    
+    Count_Task mp_regeneration = new Count_Task(10) {
         @Override
-        public int task() {
+        public int task() { 
             return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
         }
     };
@@ -25,11 +24,11 @@ public class Pet_Isaac extends Arena_Pet{
     
     @Override
     protected void initImage(){
-        String cwd = System.getProperty("user.dir")+"\\";
-        images[0] = Image.ReadImage(cwd+"Kerrigan0.png");
-        images[1] = Image.ReadImage(cwd+"Kerrigan1.png");
-        images[2] = Image.ReadImage(cwd+"Kerrigan2.png");
-        images[3] = Image.ReadImage(cwd+"Kerrigan3.png");
+        images = new BufferedImage[3];
+        for(int i=0; i<3; i++){
+            String a = String.format("%sfly_monster%d.png", POOUtil.getCWD()+"images/", i+1);
+            images[i] = POOUtil.getImage(a);
+        }
     }
     
     @Override
@@ -44,16 +43,28 @@ public class Pet_Isaac extends Arena_Pet{
     private Skills getSkills(int keycode){
         for(int i: movestate.keyDump())
             if(i == keycode || i == -keycode) return new Move();
-        
         switch(keycode){
             case KeyEvent.VK_Q: return new Attack();
-            case KeyEvent.VK_SPACE: return new Guard();
-            case -KeyEvent.VK_SPACE: return new UnGuard();
+            case KeyEvent.VK_E: return new Guard();
+            case KeyEvent.VK_SPACE: return new Jump();
+            case KeyEvent.VK_2: return new MissleAttack();
         }
         
         return null;
     }
 
+    private Skills getComboSkills(ArrayList<Integer> recentKey){
+        int []a = {KeyEvent.VK_SPACE, KeyEvent.VK_D, KeyEvent.VK_SPACE};
+        for(int i=0; i<recentKey.size(); i++){
+            int match = 0;
+            for(int j=0; j<3; j++){
+                if(recentKey.get(i) == a[j]) match += 1;
+            }
+            if(match == 3) return new MissleAttack();
+        }
+        return null;
+    }
+    
     @Override
     public void setMovestate(MoveState movestate){
         this.movestate = movestate;
@@ -63,39 +74,53 @@ public class Pet_Isaac extends Arena_Pet{
 	protected POOAction act(POOArena oldarena){
         mp_regeneration.run();
         
+        POOAction e = new POOAction();
+        e.skill = null;
+        e.dest = null;
+        
         Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.petGetKey(this);
-        try{
-            int key = 0;
-            for (Integer integer : keys) {
-                if( !(getSkills(integer) instanceof Move) )key = integer;
-            }
-                
-            POOAction e = new POOAction();
-            e.skill = getSkills(key);
-            e.dest = null;
-
+        e.skill = getComboSkills(arena.getRecentKey());
+        if(e.skill != null){
             if( ((Skills)e.skill).require(this) ){;
                 if(e.skill instanceof TimerSkills){
                      skilllist.add(((TimerSkills)e.skill));
                      ((TimerSkills)e.skill).startTimer(arena);
+                     return e;
                 }
             }
-            else e.skill = null;
-            return e;
-        }catch(Exception e){}
+        }
+        
+        
+        HashSet<Integer> keys = arena.getKey();
+        int key = 0;
+        for (Integer integer : keys) 
+            if( getSkills(integer) != null && !(getSkills(integer) instanceof Move) )key = integer;
+        
+        e.skill = getSkills(key);
+        e.dest = null;
+
+        if( e.skill != null && ((Skills)e.skill).require(this) ){;
+            if(e.skill instanceof TimerSkills){
+                 skilllist.add(((TimerSkills)e.skill));
+                 ((TimerSkills)e.skill).startTimer(arena);
+            }
+        }
+        else e.skill = null;
         return null;
 	}
 
     @Override
 	protected POOCoordinate move(POOArena oldarena){
         Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.petGetKey(this);
+        HashSet<Integer> keys = arena.getKey();
+        if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
+        
         try{
             int key = 0;
             for (Integer integer : keys) {
                 if(getSkills(integer) instanceof Move) {
                     key = integer;
+                    
                     POOCoordinate coor = comp.getCoor();
                     if(movestate.isDOWN(key)) coor.x += getAGI();
                     if(movestate.isUP(key)) coor.x -= getAGI();
@@ -104,35 +129,36 @@ public class Pet_Isaac extends Arena_Pet{
                     comp.setCoor(coor);
                 }
             }
-            if(movestate.isDOWN(key)) SetCurrentDirection(MoveState.STATE_DOWN);
-            else if(movestate.isUP(key)) SetCurrentDirection(MoveState.STATE_UP);
-            else if(movestate.isRight(key)) SetCurrentDirection(MoveState.STATE_RIGHT);
-            else if(movestate.isLeft(key)) SetCurrentDirection(MoveState.STATE_LEFT);
+            
+            if(movestate.isDOWN(key)) SetCurrentDirection(POOConstant.STAT_DOWN);
+            else if(movestate.isUP(key)) SetCurrentDirection(POOConstant.STAT_UP);
+            else if(movestate.isRight(key)) SetCurrentDirection(POOConstant.STAT_RIGHT);
+            else if(movestate.isLeft(key)) SetCurrentDirection(POOConstant.STAT_LEFT);
         }catch(Exception e){
             ;
         }
-        
-        
 		return null;
 	}
     
     @Override
     public int GetCurrentDirection(){
-        return CurrentDirection;
+        return POOUtil.getDirection(State);
     }
     
     @Override
     public void SetCurrentDirection(int direction){
-        if(CurrentDirection != direction){
-            CurrentDirection = direction;
-            ((Pet_Panel)comp.getComp()).set_image(direction);
+        if(!POOUtil.isStatus(State, direction)){
+            State = POOUtil.delStatus(State, POOConstant.STAT_DOWN);
+            State = POOUtil.delStatus(State, POOConstant.STAT_UP);
+            State = POOUtil.delStatus(State, POOConstant.STAT_LEFT);
+            State = POOUtil.delStatus(State, POOConstant.STAT_RIGHT);
+            State = POOUtil.setStatus(State, direction);
         }
     }
 
     @Override
     protected void initComp(Container container) {
-        Pet_Panel tmp = new Pet_Panel();
-        comp = new MyComp(container, tmp, container.getSize().height/2, container.getSize().width/4);
+        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/2, container.getSize().width/4);
         comp.setLimit(new Rectangle(new Point(0, 0), container.getSize()));
     }
 
@@ -161,11 +187,14 @@ public class Pet_Isaac extends Arena_Pet{
         statcomp.add(new MyComp(container, mp, height*3/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, hp_back, height*1/5, width*7/20, width*6/10, height/5));
         statcomp.add(new MyComp(container, mp_back, height*3/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, new JLabel(new ImageIcon(images[0])), height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
+        statcomp.add(new MyComp(container, label, height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
     }
 
+    int image_count = 0;
     @Override
     public void draw(Arena arena) {
+        image_count = (image_count+1)%(images.length*10);
+        ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[image_count/10]));
         comp.draw();
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
@@ -180,34 +209,5 @@ public class Pet_Isaac extends Arena_Pet{
         for (TimerSkills timerSkills : remove_todo) {
             skilllist.remove(timerSkills);
         }
-    }
-}
-
-class Pet_Panel extends JPanel{
-    private BufferedImage []images = new BufferedImage[4];
-    private BufferedImage current = images[0];
-    
-    public Pet_Panel(){
-        init_images();
-        set_image(MoveState.STATE_DOWN);
-    }
-    private void init_images(){
-        String cwd = System.getProperty("user.dir")+"\\";
-        images[0] = Image.ReadImage(cwd+"Kerrigan0.png");
-        images[1] = Image.ReadImage(cwd+"Kerrigan1.png");
-        images[2] = Image.ReadImage(cwd+"Kerrigan2.png");
-        images[3] = Image.ReadImage(cwd+"Kerrigan3.png");
-    }
-    protected void set_image(int i){
-        if(i == MoveState.STATE_DOWN) current = images[0];
-        else if(i == MoveState.STATE_UP) current = images[2];
-        else if(i == MoveState.STATE_LEFT) current = images[3];
-        else if(i == MoveState.STATE_RIGHT) current = images[1];
-        setPreferredSize(new Dimension(current.getWidth(), current.getHeight()));
-    }
-    
-    @Override
-    protected void paintComponent(Graphics g){
-        g.drawImage(current, 0, 0, null);
     }
 }

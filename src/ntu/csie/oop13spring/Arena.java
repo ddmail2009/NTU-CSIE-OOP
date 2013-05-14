@@ -5,14 +5,13 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 public class Arena extends POOArena implements KeyListener{
 	private boolean first_run = true;
-    HashSet<Integer> key = new HashSet<>();
+    private HashSet<Integer> key = new HashSet<>();
+    private ArrayList<Integer> recentKey = new ArrayList<>();
     private MainWindow window = new MainWindow("POOArena");
     private java.util.Timer CLI_Timer = new java.util.Timer();
 
@@ -41,10 +40,14 @@ public class Arena extends POOArena implements KeyListener{
         CLI_Timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                for (POOPet pet : getAllPets())
-                    System.out.println(pet);
+                if(recentKey.size() > 0){
+                    for (Integer integer : recentKey)
+                        System.out.print(integer + " ");
+                    System.out.println();
+                    recentKey.remove(0);
+                }
             }
-        }, 0, 1000);
+        }, 0, 500);
 	}
 
     @Override
@@ -56,6 +59,7 @@ public class Arena extends POOArena implements KeyListener{
 				POOAction act = e.act(this);
                 if(act != null && act.skill != null && act.dest != null) act.skill.act(act.dest);
 			}
+            e.move(this);
 		}
         int alive = 0;
         for (POOPet e: getAllPets())
@@ -80,7 +84,6 @@ public class Arena extends POOArena implements KeyListener{
         
         for (POOPet pOOPet : getAllPets()) {
             Arena_Pet pet = (Arena_Pet)pOOPet;
-            pet.move(this);
             pet.draw(this);
         }
 	}
@@ -89,8 +92,11 @@ public class Arena extends POOArena implements KeyListener{
 	public POOCoordinate getPosition(POOPet p){
 		return ((Arena_Pet)p).getComp().getCoor();
 	}
-    protected HashSet<Integer> petGetKey(POOPet pet){
+    protected HashSet<Integer> getKey(){
         return key;
+    }
+    protected ArrayList<Integer> getRecentKey(){
+        return recentKey;
     }
     public int searchPosition(POOCoordinate t){
 		POOPet[] parr = getAllPets();
@@ -121,12 +127,13 @@ public class Arena extends POOArena implements KeyListener{
     }
     @Override
     public void keyReleased(KeyEvent e) {
-        for (Integer integer : key) {
+        System.out.print("Current key: ");
+        for (Integer integer : key)
             System.out.print(integer + " ");
-        }
-        System.out.println("release " + e.getKeyCode() + " key\n");
+        System.out.println(", release " + e.getKeyCode() + " key");
         
-        key.remove(e.getKeyCode());
+        if(key.remove(e.getKeyCode()))
+            recentKey.add(e.getKeyCode());
     }
 }
 
@@ -160,6 +167,7 @@ class MyComp{
         this.comp = comp;
         this.comp.setSize(new Dimension(width, height));
         this.coor = new Coordinate(x, y);
+        
     }
     public void setLimit(Rectangle rec){
         limit = (Rectangle)(rec.clone());
@@ -167,7 +175,6 @@ class MyComp{
     public JComponent getComp(){
         return comp;
     }
-
     public POOCoordinate getCoor(){
         return new Coordinate(coor.x, coor.y);
     }
@@ -181,7 +188,7 @@ class MyComp{
     public void draw(){
         Insets insets = contain.getInsets();
         comp.setBounds(coor.y+insets.left, coor.x+insets.top, this.comp.getSize().width, this.comp.getSize().height);
-        comp.setVisible(true);
+//        comp.setVisible(true);
     }
     private boolean isInside(int left, int middle, int right){
         return left<=middle && middle<right;
