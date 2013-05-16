@@ -21,6 +21,7 @@ local.properties
 *.jar
 hw4.pdf
 ntu/*
+hw4.jar
 
 # External tool builders
 .externalToolBuilders/
