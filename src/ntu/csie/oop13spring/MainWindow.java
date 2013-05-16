@@ -14,16 +14,6 @@ public class MainWindow extends javax.swing.JFrame {
     private JMenuBar jMenuBar1;
     
     public MainWindow(String title) {
-//        try {
-//            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-//                if ("Nimbus".equals(info.getName())) {
-//                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-//                    break;
-//                }
-//            }
-//        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-//            java.util.logging.Logger.getLogger(MainWindow.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-//        }
         initComponents();
         setTitle(title);
         Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
@@ -35,7 +25,7 @@ public class MainWindow extends javax.swing.JFrame {
         Main_Panel = new JPanel();
         Stat_Panel = new JPanel();
         Stat_PanelArr = new JPanel[8];
-        Combat_Panel = new ImagePanel(POOUtil.getCWD() + "images/Insaniquarium/aquarium7.jpg");
+        Combat_Panel = new ImagePanel(POOUtil.getCWD() + "images/background.png");
         jMenuBar1 = new JMenuBar();
         jMenu1 = new JMenu();
         jMenu3 = new JMenu();

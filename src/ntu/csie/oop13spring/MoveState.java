@@ -13,7 +13,7 @@ public class MoveState {
         ;
     }
     
-    public MoveState(int UP, int DOWN, int LEFT, int RIGHT) {
+    public MoveState(int UP, int RIGHT, int DOWN, int LEFT) {
         this.UP   = UP;
         this.DOWN = DOWN;
         this.LEFT = LEFT;

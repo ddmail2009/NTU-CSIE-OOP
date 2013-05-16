@@ -11,6 +11,8 @@ import java.io.File;
 import javax.imageio.ImageIO;
 
 public class POOUtil {
+    private POOUtil(){}
+    
     public static String getCWD(){
         return System.getProperty("user.dir")+File.separator;
     }
@@ -27,6 +29,7 @@ public class POOUtil {
         try{
             return ImageIO.read(new File(path));
         }catch(Exception e){
+            System.err.println(path + "  Can't read");
             e.printStackTrace();
             return null;
         }
@@ -42,6 +45,9 @@ public class POOUtil {
         else if(isStatus(state, POOConstant.STAT_LEFT))return POOConstant.STAT_LEFT;
         else if(isStatus(state, POOConstant.STAT_RIGHT))return POOConstant.STAT_RIGHT;
         else return POOConstant.STAT_STOP;
+    }
+    public static boolean isInside(int low, int middle, int high){
+        return (low<=middle && middle<high);
     }
 }
 

@@ -1,20 +1,23 @@
 package ntu.csie.oop13spring;
 
-import java.awt.Container;
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.*;
 
-public abstract class Arena_Pet extends POOPet {
+public abstract class Pet extends POOPet {
     protected MyComp comp;
     protected ArrayList<MyComp> statcomp = new ArrayList<>();
-    protected MoveState movestate = new MoveState();
-    protected int State = 0;
+    protected int State = POOConstant.STAT_DOWN;
     protected ArrayList<TimerSkills> skilllist = new ArrayList<>();
     
-    protected abstract void init(int HP, int MP, int AGI, String str, MoveState movestate);
+    protected abstract void init(int HP, int MP, int AGI, String str);
     protected abstract void initImage();
     protected abstract void initComp(Container container);
     protected abstract void initStatComp(Container container);
-    public abstract void setMovestate(MoveState movestate);
+    /**
+     * Set Actionkeys for the pet
+     * @param actionkeys contain corresponding {top, right, down, left, attack, guard, jump}
+     */
+    public abstract void setActionkeys(Integer []actionkeys);
     public abstract int GetCurrentDirection();
     public abstract void SetCurrentDirection(int direction);
     public abstract void draw(Arena arena);
@@ -23,13 +26,11 @@ public abstract class Arena_Pet extends POOPet {
         return State;
     }
     public void setState(int state){
-//        System.out.printf("state=%d, %d\n", State, state);
         State = state;
     }
     
-    public void damage(int number){
-        if( !POOUtil.isStatus(State, POOConstant.STAT_GUARD) ){
-            System.out.println("Hit" + "Current State = "+State);
+    public void damage(int number, int attack_type ){
+        if( !POOUtil.isStatus(State, POOConstant.STAT_GUARD) || POOUtil.isStatus(attack_type, POOSkillConstant.IGNORE_GUARD) ){
             TimerSkills skill = new BodyBlink();
             if(skill.require(this)){
                 skill.startTimer(null);

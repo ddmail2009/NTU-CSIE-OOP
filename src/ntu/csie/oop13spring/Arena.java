@@ -2,11 +2,9 @@ package ntu.csie.oop13spring;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.util.*;
-import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class Arena extends POOArena implements KeyListener{
 	private boolean first_run = true;
@@ -21,11 +19,11 @@ public class Arena extends POOArena implements KeyListener{
     
 	private void init(){   
         POOPet[] oldparr = getAllPets();
-        final Arena_Pet[] parr = new Arena_Pet[oldparr.length];
+        final Pet[] parr = new Pet[oldparr.length];
         for (int i = 0; i < oldparr.length; i++)
-            parr[i] = (Arena_Pet)oldparr[i];
+            parr[i] = (Pet)oldparr[i];
         
-        for (Arena_Pet pet : parr)
+        for (Pet pet : parr)
             pet.initImage();
 		for (int i=0; i<parr.length; i++){
             parr[i].initComp(window.Combat_Panel);
@@ -40,6 +38,8 @@ public class Arena extends POOArena implements KeyListener{
         CLI_Timer.schedule(new TimerTask() {
             @Override
             public void run() {
+               for (POOPet pet : getAllPets())
+                   System.out.println(pet);
                 if(recentKey.size() > 0){
                     for (Integer integer : recentKey)
                         System.out.print(integer + " ");
@@ -47,7 +47,7 @@ public class Arena extends POOArena implements KeyListener{
                     recentKey.remove(0);
                 }
             }
-        }, 0, 500);
+        }, 0, 400);
 	}
 
     @Override
@@ -83,20 +83,21 @@ public class Arena extends POOArena implements KeyListener{
         }
         
         for (POOPet pOOPet : getAllPets()) {
-            Arena_Pet pet = (Arena_Pet)pOOPet;
+            Pet pet = (Pet)pOOPet;
             pet.draw(this);
         }
 	}
     
     @Override
 	public POOCoordinate getPosition(POOPet p){
-		return ((Arena_Pet)p).getComp().getCoor();
+		return ((Pet)p).getComp().getCoor();
 	}
     protected HashSet<Integer> getKey(){
         return key;
     }
-    protected ArrayList<Integer> getRecentKey(){
-        return recentKey;
+    protected Integer[] getRecentKey(){
+        Integer []a = new Integer[0];
+        return recentKey.toArray(a);
     }
     public int searchPosition(POOCoordinate t){
 		POOPet[] parr = getAllPets();
@@ -104,17 +105,19 @@ public class Arena extends POOArena implements KeyListener{
 			if (t.equals(getPosition(parr[i]))) return i;
 		return -1;
 	}
-    public int searchBlockPosition(Rectangle t, ArrayList<Arena_Pet> blockList){
+    
+    public int searchBlockPosition(Rectangle t, ArrayList<Pet> blockList){
         POOPet[] parr = getAllPets();
-        for(int i=0; i<t.height; i++)
-            for(int j=0; j<t.width; j++){
-                Component comp = window.Combat_Panel.getComponentAt(t.x+i, t.y+j);
-                for (int k=0; k<parr.length; k++) {
-                    Arena_Pet pet = (Arena_Pet)parr[k];
-                    if(blockList.indexOf(pet) >= 0)continue;
-                    if(pet.comp.getComp() == comp) return k;
-                }
-            }
+        for (int i = 0; i < parr.length; i++) {
+            Pet pet = (Pet) parr[i];
+            
+            if(blockList.indexOf(pet) >= 0) continue;
+            Rectangle tmp = new Rectangle(pet.comp.getCoor().x, pet.comp.getCoor().y, pet.comp.getComp().getSize().height, pet.comp.getComp().getSize().width);
+            for(int j=0; j<t.height; j++)
+                for(int k=0; k<t.width; k++)
+                    if(POOUtil.isInside(tmp.x, t.x+j, tmp.x+tmp.height) && POOUtil.isInside(tmp.y, t.y+k, tmp.y+tmp.width)) 
+                        return i;
+        }
         return -1;
     }
     @Override
@@ -132,19 +135,9 @@ public class Arena extends POOArena implements KeyListener{
             System.out.print(integer + " ");
         System.out.println(", release " + e.getKeyCode() + " key");
         
-        if(key.remove(e.getKeyCode()))
-            recentKey.add(e.getKeyCode());
-    }
-}
-
-class Image{
-    static public BufferedImage ReadImage(String path){
-        try{
-            return ImageIO.read(new File(path));
-        }catch(Exception e){
-            System.out.println("Image "+path+" Can not be found!!");
-            e.printStackTrace();
-            return null;
+        if(key.remove(e.getKeyCode())){
+            if(recentKey.indexOf(e.getKeyCode()) < 0)
+                recentKey.add(e.getKeyCode());
         }
     }
 }
@@ -167,7 +160,7 @@ class MyComp{
         this.comp = comp;
         this.comp.setSize(new Dimension(width, height));
         this.coor = new Coordinate(x, y);
-        
+        // this.comp.setBorder(new LineBorder(Color.yellow));
     }
     public void setLimit(Rectangle rec){
         limit = (Rectangle)(rec.clone());
@@ -178,19 +171,30 @@ class MyComp{
     public POOCoordinate getCoor(){
         return new Coordinate(coor.x, coor.y);
     }
+    protected void setCoorForce(POOCoordinate coor){
+        this.coor.x = coor.x;
+        this.coor.y = coor.y;
+    }
     protected void setCoor(POOCoordinate coor){  
         Insets insets = contain.getInsets();
-        if(limit != null && isInside(limit.y, coor.y+insets.left, limit.width-this.comp.getSize().width))this.coor.y = coor.y;
+        if(limit != null && POOUtil.isInside(limit.y, coor.y+insets.left, limit.width-this.comp.getSize().width))this.coor.y = coor.y;
         else if(limit == null)this.coor.y = coor.y;
-        if(limit != null && isInside(limit.x, coor.x+insets.top, limit.height-this.comp.getSize().height))this.coor.x = coor.x;
+        if(limit != null && POOUtil.isInside(limit.x, coor.x+insets.top, limit.height-this.comp.getSize().height))this.coor.x = coor.x;
         else if(limit == null)this.coor.x = coor.x;
     }
     public void draw(){
         Insets insets = contain.getInsets();
         comp.setBounds(coor.y+insets.left, coor.x+insets.top, this.comp.getSize().width, this.comp.getSize().height);
-//        comp.setVisible(true);
     }
-    private boolean isInside(int left, int middle, int right){
-        return left<=middle && middle<right;
+    public void dispose(){
+        comp.setVisible(false);
+        comp.getParent().remove(comp);
+    }
+    public Rectangle getBounds(){
+        Rectangle s = new Rectangle(comp.getBounds());
+        int tmp = s.x;
+        s.x = s.y;
+        s.y = tmp;
+        return s;
     }
 }
