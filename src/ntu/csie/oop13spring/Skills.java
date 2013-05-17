@@ -1,12 +1,17 @@
 package ntu.csie.oop13spring;
 
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.*;
 
 public abstract class Skills extends POOSkill{
     private String name, description;
+    protected Pet from;
+    protected Arena arena;
 
     public Skills(String str, String des){
         name = str;
@@ -18,7 +23,7 @@ public abstract class Skills extends POOSkill{
     public final String getDesString(){
         return description;
     }
-	protected abstract boolean require(POOPet pet);
+	protected abstract boolean require(POOPet pet, Arena arena);
     @Override
     public abstract void act(POOPet pet);
 }
@@ -28,14 +33,14 @@ public abstract class Skills extends POOSkill{
     public TimerSkills(String str, String des){
         super(str, des);
     }
-    public abstract void startTimer(POOArena arena);
-    public abstract int update(final POOPet pet, Arena arena);
+    public abstract void startTimer();
+    public abstract int update(Arena arena);
 }
 
 class Attack extends TimerSkills{
     private int speed = 5;
-    private Pet npet;
     private MyComp comp;
+    
     private class Vector{
         Vector(double a, double b){
             x = a;
@@ -53,44 +58,45 @@ class Attack extends TimerSkills{
 		super(str, Des);
 	}
     @Override
-	protected boolean require(POOPet pet){
-        npet = (Pet)pet;
-        if(npet.getTimer("Attack") < 10/npet.getAGI()) return false;
+	protected boolean require(POOPet pet, Arena arena){
+        this.arena = arena;
+        from = (Pet)pet;
         
-        npet.resetTimer("Attack");
-        if(npet.getRegister("AttackDirection") == null){
-            if( npet.GetCurrentDirection() == POOConstant.STAT_UP )Direction = new Vector(-1, 0);
-            else if( npet.GetCurrentDirection() == POOConstant.STAT_DOWN )Direction = new Vector(1, 0);
-            else if( npet.GetCurrentDirection() == POOConstant.STAT_RIGHT )Direction = new Vector(0, 1);
-            else if( npet.GetCurrentDirection() == POOConstant.STAT_LEFT )Direction = new Vector(0, -1);
+        if(from.getTimer("Attack") < 10/from.getAGI()) return false;
+        
+        from.resetTimer("Attack");
+        if(from.getRegister("AttackDirection") == null){
+            if( from.GetCurrentDirection() == POOConstant.STAT_UP )Direction = new Vector(-1, 0);
+            else if( from.GetCurrentDirection() == POOConstant.STAT_DOWN )Direction = new Vector(1, 0);
+            else if( from.GetCurrentDirection() == POOConstant.STAT_RIGHT )Direction = new Vector(0, 1);
+            else if( from.GetCurrentDirection() == POOConstant.STAT_LEFT )Direction = new Vector(0, -1);
         }
         else{
-            Coordinate d = ((Coordinate)npet.getRegister("AttackDirection"));
+            Coordinate d = ((Coordinate)from.getRegister("AttackDirection"));
             Direction = new Vector(d.x/Math.sqrt(d.x*d.x+d.y*d.y), d.y/Math.sqrt(d.x*d.x+d.y*d.y));
             
-            npet.clearRegister("AttackDirection");
+            from.clearRegister("AttackDirection");
         }
         return pet.setMP(pet.getMP()-1);
 	}
     
     @Override
 	public void act(POOPet pet){
-		((Pet)pet).damage(pet.getHP()-1, POOSkillConstant.NORMAL);
+		((Pet)pet).damage(arena, from, pet.getHP()-1, POOSkillConstant.NORMAL);
 	}
         
     @Override
-    public void startTimer(final POOArena arena){
-        Point objoffset = new Point(npet.comp.getCoor().x + npet.comp.getComp().getSize().height/2, npet.comp.getCoor().y + npet.comp.getComp().getSize().width/2);
-        
-        comp = new MyComp(npet.comp.getComp().getParent(), new JPanel(), objoffset.x, objoffset.y, 5, 5);
-        comp.getComp().setBorder(new LineBorder(Color.black));
-        comp.getComp().setBackground(Color.red);
+    public void startTimer(){
+        Point objoffset = new Point(from.comp.getCoor().x + from.comp.getComp().getSize().height/2, from.comp.getCoor().y + from.comp.getComp().getSize().width/2);
+
+        BufferedImage pic = POOUtil.getImage(POOUtil.getCWD()+"images/attack/attack5.png");
+        comp = new MyComp(from.comp.getComp().getParent(), new JLabel(new ImageIcon(pic)), objoffset.x, objoffset.y);
         comp.getComp().setVisible(false);
         counter = 0;
     }
     
     @Override
-    public int update(POOPet pet, Arena arena){       
+    public int update(Arena arena){       
         counter ++;
         comp.getComp().setVisible(true);
         
@@ -101,7 +107,9 @@ class Attack extends TimerSkills{
         comp.draw();
 
         ArrayList<Pet> blocklist = new ArrayList<>();
-        blocklist.add(npet);
+        for (Pet pet1 : ((Arena)arena).allpets) {
+            if(pet1.getName().equals(from.getName()))blocklist.add(pet1);
+        }
         
         Pet tmp = null;
         int index = ((Arena)arena).searchBlockPosition(comp.getBounds(), blocklist);
@@ -127,7 +135,9 @@ class Move extends Skills{
 	}
     
     @Override
-    protected  boolean require(POOPet pet){
+    protected  boolean require(POOPet pet, Arena arena){
+        from = (Pet)pet;
+        this.arena = arena;
         return true;
     }
     
@@ -152,24 +162,26 @@ class Guard extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
+    public void startTimer() {
         counter = 0;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
         counter ++;
-        if(counter % 4 == 0)pet.setMP(pet.getMP()-1);
+        if(counter % 4 == 0)from.setMP(from.getMP()-1);
         
-        if( !arena.getKey().contains(((Pet)pet).actionkeys[5]) ){
-            act(pet);
+        if( !arena.getKey().contains(from.actionkeys[5]) ){
+            act(from);
             return -1;
         }
         return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet)pet;
+        this.arena = arena;
         if(POOUtil.isStatus(((Pet)pet).getState(), POOConstant.STAT_GUARD) && pet.getMP() > 5)return false;
         ((Pet)pet).setState(POOUtil.setStatus( ((Pet)pet).getState(), POOConstant.STAT_LOCK | POOConstant.STAT_GUARD ));
         return true;
@@ -187,27 +199,29 @@ class Jump extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
+    public void startTimer() {
         ;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
-        POOCoordinate coor = ((Pet)pet).comp.getCoor();
+    public int update(Arena arena) {
+        POOCoordinate coor = from.comp.getCoor();
         coor.x -= velocity;
-        ((Pet)pet).comp.setCoorForce(coor);
+        from.comp.setCoorForce(coor);
         
         velocity -= 0.2;
         
         if(velocity < -4) {
-            act(pet);
+            act(from);
             return -1;
         }
         return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet)pet;
+        this.arena = arena;
         int state = ((Pet)pet).getState();
         if(POOUtil.isStatus(state, POOConstant.STAT_JUMP)) return false;
         
@@ -225,7 +239,6 @@ class Jump extends TimerSkills{
 class MissleAttack extends TimerSkills{
     private ArrayList<MyComp> comp = new ArrayList<>(4);
     private ArrayList<Point> acceleration = new ArrayList<>(4);
-    private Pet npet;
     private int speed = 2;
 
     public MissleAttack(String str, String des) {
@@ -237,9 +250,9 @@ class MissleAttack extends TimerSkills{
     }
     
     @Override
-    public void startTimer(POOArena arena) {       
+    public void startTimer() {       
         for (int i = 0; i < 4; i++) {             
-            comp.add( new MyComp(npet.comp.getComp().getParent(), new JPanel(), npet.comp.getCoor().x+npet.comp.getComp().getHeight()/2, npet.comp.getCoor().y+npet.comp.getComp().getWidth()/2, 10, 10) );
+            comp.add( new MyComp(from.comp.getComp().getParent(), new JPanel(), from.comp.getCoor().x+from.comp.getComp().getHeight()/2, from.comp.getCoor().y+from.comp.getComp().getWidth()/2, 10, 10) );
             comp.get(i).getComp().setBorder(new LineBorder(Color.black));
             comp.get(i).getComp().setBackground(Color.red);
             comp.get(i).getComp().setVisible(false);
@@ -248,10 +261,10 @@ class MissleAttack extends TimerSkills{
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
         counter ++;
         
-        ArrayList<Pet> enemys = ((Arena)arena).getAllPetsExcept(npet);
+        ArrayList<Pet> enemys = ((Arena)arena).getAllPetsExcept(from);
         for (int i=comp.size()-1; i>=0 ; i--) {
             MyComp myComp = comp.get(i);
             myComp.getComp().setVisible(true);
@@ -283,7 +296,7 @@ class MissleAttack extends TimerSkills{
             
             POOPet tmp = null;
             ArrayList<Pet> blocklist = new ArrayList<>();
-            blocklist.add(npet);
+            blocklist.add(from);
             
             int index = ((Arena)arena).searchBlockPosition(myComp.getBounds(), blocklist);
             if(index >= 0) tmp = ((Arena)arena).allpets.get(index);
@@ -297,23 +310,25 @@ class MissleAttack extends TimerSkills{
         
         if( counter == 80 || comp.size() == 0 ){
             for (MyComp myComp : comp) myComp.dispose();
-            npet.clearRegister("MissleAttack");
+            from.clearRegister("MissleAttack");
             return -1;
         }
         return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
-        npet = ((Pet)pet);
-        if(npet.getRegister("MissleAttack") != null ) return false;
-        npet.setRegister("MissleAttack", new Object());
+    protected boolean require(POOPet pet, Arena arena) {
+        from = ((Pet)pet);
+        this.arena = arena;
+        
+        if(from.getRegister("MissleAttack") != null ) return false;
+        from.setRegister("MissleAttack", new Object());
         return pet.setMP(pet.getMP()-30);
     }
 
     @Override
     public void act(POOPet pet) {
-        ((Pet)pet).damage(pet.getHP()-5, POOSkillConstant.NORMAL);
+        ((Pet)pet).damage(arena, from, pet.getHP()-5, POOSkillConstant.NORMAL);
     }
 }
 
@@ -326,27 +341,29 @@ class BodyBlink extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
+    public void startTimer() {
         counter = 0;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
         counter ++;
         if(counter%5 == 0){
-            if(counter%10 != 0)((Pet)pet).comp.getComp().setVisible(false);
-            else ((Pet)pet).comp.getComp().setVisible(true);
+            if(counter%10 != 0)from.comp.getComp().setVisible(false);
+            else from.comp.getComp().setVisible(true);
         }
         
         if(counter >= 30) {
-            act(pet);
+            act(from);
             return -1;
         }
         else return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet)pet;
+        this.arena = arena;
         if(POOUtil.isStatus(((Pet)pet).getState(), POOConstant.STAT_BLINK)) return false;
         else ((Pet)pet).setState( POOUtil.setStatus(((Pet)pet).getState(), POOConstant.STAT_BLINK) );
         return true;
@@ -360,7 +377,6 @@ class BodyBlink extends TimerSkills{
 }
 
 class Bombs extends TimerSkills{
-    private Pet npet;
     private MyComp comp;
     private ImageIcon []images;
     ArrayList<Pet> blocklist = new ArrayList<>();
@@ -373,7 +389,7 @@ class Bombs extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
+    public void startTimer() {
         images = new ImageIcon[5];
         images[0] = new ImageIcon( POOUtil.getImage(POOUtil.getCWD() + "images/bomb1.png") );
         images[1] = new ImageIcon( POOUtil.getImage(POOUtil.getCWD() + "images/bomb2.png") );
@@ -382,14 +398,14 @@ class Bombs extends TimerSkills{
         images[4] = new ImageIcon( POOUtil.getImage(POOUtil.getCWD() + "images/explode.png") );
         
         JLabel bomb = new JLabel(images[0]);
-        comp = new MyComp(npet.comp.getComp().getParent(), bomb, 0, 0, bomb.getIcon().getIconHeight(), bomb.getIcon().getIconWidth());
-        comp.setCoor(new Coordinate(npet.comp.getCoor().x + npet.comp.getComp().getSize().height/2 - bomb.getIcon().getIconHeight()/2 + 10, npet.comp.getCoor().y + npet.comp.getComp().getSize().width/2 - bomb.getIcon().getIconWidth()/2 + 10));
+        comp = new MyComp(from.comp.getComp().getParent(), bomb, 0, 0, bomb.getIcon().getIconHeight(), bomb.getIcon().getIconWidth());
+        comp.setCoor(new Coordinate(from.comp.getCoor().x + from.comp.getComp().getSize().height/2 - bomb.getIcon().getIconHeight()/2 + 10, from.comp.getCoor().y + from.comp.getComp().getSize().width/2 - bomb.getIcon().getIconWidth()/2 + 10));
         comp.getComp().setVisible(false);
         counter = 0;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
         counter++;
         comp.getComp().setVisible(true);
         
@@ -417,29 +433,31 @@ class Bombs extends TimerSkills{
                 
         if(counter == 140){
             comp.dispose();
-            npet.setState(POOUtil.delStatus(npet.getState(), POOConstant.STAT_USERDEFINE1));
+            from.setState(POOUtil.delStatus(from.getState(), POOConstant.STAT_USERDEFINE1));
             return -1;
         }
         return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
-        npet = (Pet) pet;
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet) pet;
+        this.arena = arena;
         
-        if(POOUtil.isStatus(npet.getState(), POOConstant.STAT_USERDEFINE1)) return false;
-        npet.setState(POOUtil.setStatus(npet.getState(), POOConstant.STAT_USERDEFINE1));
+        if(((Pet)pet).getTimer("Bomb") < 60) return false;
+        ((Pet)pet).resetTimer("Bomb");
+//        if(POOUtil.isStatus(npet.getState(), POOConstant.STAT_USERDEFINE1)) return false;
+//        npet.setState(POOUtil.setStatus(npet.getState(), POOConstant.STAT_USERDEFINE1));
         return pet.setMP(pet.getMP() - 15);
     }
 
     @Override
     public void act(POOPet pet) {
-        ((Pet)pet).damage(pet.getHP()-30, POOSkillConstant.IGNORE_GUARD);
+        ((Pet)pet).damage(arena, from, pet.getHP()-30, POOSkillConstant.IGNORE_GUARD);
     }
 }
 
 class ShockWave extends TimerSkills{
-    private Pet npet;
     private MyComp comp;
     ArrayList<Pet> blocklist = new ArrayList<>();
     
@@ -451,24 +469,25 @@ class ShockWave extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
+    public void startTimer() {
         JPanel laser = new JPanel();
-        comp = new MyComp(npet.comp.getComp().getParent(), laser, npet.comp.getCoor().x + npet.comp.getComp().getHeight()/2, npet.comp.getCoor().y + npet.comp.getComp().getWidth(), npet.comp.getComp().getParent().getWidth(), 10);
+        comp = new MyComp(from.comp.getComp().getParent(), laser, from.comp.getCoor().x + from.comp.getComp().getHeight()/2, from.comp.getCoor().y + from.comp.getComp().getWidth(), from.comp.getComp().getParent().getWidth(), 10);
         laser.setBackground(Color.red);
         comp.getComp().setVisible(false);
-        blocklist.add(npet);
+        blocklist.add(from);
         counter = 0;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
+        this.arena = arena;
         comp.getComp().setVisible(true);
         comp.draw();
         counter ++;
         
         if(counter % 20 == 0){
             blocklist.clear();
-            blocklist.add(npet);
+            blocklist.add(from);
             while(true){
                 Rectangle t = comp.getBounds();
                 int index = arena.searchBlockPosition(t, blocklist);
@@ -483,29 +502,29 @@ class ShockWave extends TimerSkills{
         
         if(counter > 100){
             comp.dispose();
-            npet.setState(POOUtil.delStatus(npet.getState(), POOConstant.STAT_USERDEFINE2));
+            from.setState(POOUtil.delStatus(from.getState(), POOConstant.STAT_USERDEFINE2));
             return -1;
         }
         return 0;
     }
 
     @Override
-    protected boolean require(POOPet pet) {
-        npet = (Pet) pet;
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet) pet;
+        this.arena = arena;
         
-        if(POOUtil.isStatus(npet.getState(), POOConstant.STAT_USERDEFINE2)) return false;
-        npet.setState(POOUtil.setStatus(npet.getState(), POOConstant.STAT_USERDEFINE2));
+        if(POOUtil.isStatus(from.getState(), POOConstant.STAT_USERDEFINE2)) return false;
+        from.setState(POOUtil.setStatus(from.getState(), POOConstant.STAT_USERDEFINE2));
         return pet.setMP(pet.getMP() - 10);
     }
 
     @Override
     public void act(POOPet pet) {
-        ((Pet)pet).damage(pet.getHP()-5, POOSkillConstant.IGNORE_GUARD);
+        ((Pet)pet).damage(arena, from, pet.getHP()-5, POOSkillConstant.IGNORE_GUARD);
     }
 }
 
 class Message extends TimerSkills{
-    private Pet npet;
     private MyComp comp;
     private String message;
     
@@ -517,14 +536,14 @@ class Message extends TimerSkills{
     }
 
     @Override
-    public void startTimer(POOArena arena) {
-        comp = new MyComp(npet.comp.getComp().getParent(), new JLabel( message, JLabel.CENTER ), npet.comp.getCoor().x-10, npet.comp.getCoor().y-20, 20, 20);
+    public void startTimer() {
+        comp = new MyComp(from.comp.getComp().getParent(), new JLabel( message, JLabel.CENTER ), from.comp.getCoor().x-10, from.comp.getCoor().y-20, 20, 20);
         comp.getComp().setForeground(Color.red);
         counter = 0;
     }
 
     @Override
-    public int update(POOPet pet, Arena arena) {
+    public int update(Arena arena) {
         counter ++;
         comp.getComp().setVisible(true);
         POOCoordinate tmp = comp.getCoor();
@@ -533,7 +552,7 @@ class Message extends TimerSkills{
         comp.draw();
         
         if(counter >= 20){
-            npet.clearRegister("Damage");
+            from.clearRegister("Damage");
             comp.dispose();
             return -1;
         }
@@ -541,10 +560,12 @@ class Message extends TimerSkills{
     }
 
     @Override
-    protected boolean require(POOPet pet) {
-        npet = (Pet)pet;
-        message = (String)npet.getRegister("Damage");
-        npet.clearRegister("Damage");
+    protected boolean require(POOPet pet, Arena arena) {
+        from = (Pet)pet;
+        this.arena = arena;
+        
+        message = (String)from.getRegister("Damage");
+        from.clearRegister("Damage");
         return true;
     }
 

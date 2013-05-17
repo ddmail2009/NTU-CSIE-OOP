@@ -112,11 +112,7 @@ public class Pet_Magmortar extends Pet{
         Arena arena = (Arena)oldarena;
         e.skill = getComboSkills(arena.getRecentKey());
         if(e.skill != null){
-            if( ((Skills)e.skill).require(this) ){
-                if(e.skill instanceof TimerSkills){
-                     skilllist.add(((TimerSkills)e.skill));
-                     ((TimerSkills)e.skill).startTimer(arena);
-                }
+            if( ((Skills)e.skill).require(this, arena) ){
                 return e;
             }
         }
@@ -127,11 +123,7 @@ public class Pet_Magmortar extends Pet{
             Skills t = getSkills(integer);
             if(t != null && !(t instanceof Move)){
                 e.skill = t;
-                if(t.require(this)){
-                    if(t instanceof TimerSkills){
-                        skilllist.add(((TimerSkills)e.skill));
-                        ((TimerSkills)e.skill).startTimer(arena);
-                    }
+                if(t.require(this, arena)){
                     return e;
                 }
             }
@@ -146,7 +138,9 @@ public class Pet_Magmortar extends Pet{
         if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
         
         int key = 0;
-        for (Integer integer : keys) {
+        for (Iterator<Integer> it = keys.iterator(); it.hasNext();) {
+            Integer integer = it.next();
+            
             if(getSkills(integer) instanceof Move) {
                 key = integer;
 
@@ -228,9 +222,5 @@ public class Pet_Magmortar extends Pet{
         
         for (MyComp myComp : statcomp)
             myComp.draw();
-      
-        for (int i=skilllist.size()-1; i>=0; i--)
-            if(skilllist.get(i).update(this, arena) == -1)
-                skilllist.remove(i);
     }
 }

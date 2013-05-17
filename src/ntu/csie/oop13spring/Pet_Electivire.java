@@ -107,12 +107,8 @@ public class Pet_Electivire extends Pet{
         Arena arena = (Arena)oldarena;
         e.skill = getComboSkills(arena.getRecentKey());
         if(e.skill != null){
-            if( ((Skills)e.skill).require(this) ){
-                if(e.skill instanceof TimerSkills){
-                     skilllist.add(((TimerSkills)e.skill));
-                     ((TimerSkills)e.skill).startTimer(arena);
-                     return e;
-                }
+            if( ((Skills)e.skill).require(this, arena) ){
+                return e;
             }
         }
         
@@ -125,11 +121,8 @@ public class Pet_Electivire extends Pet{
         e.skill = getSkills(key);
         e.dest = null;
 
-        if( e.skill != null && ((Skills)e.skill).require(this) ){
-            if(e.skill instanceof TimerSkills){
-                 skilllist.add(((TimerSkills)e.skill));
-                 ((TimerSkills)e.skill).startTimer(arena);
-            }
+        if( e.skill != null && ((Skills)e.skill).require(this, arena) ){
+            return e;
         }
         else e.skill = null;
         return null;
@@ -229,9 +222,5 @@ public class Pet_Electivire extends Pet{
         
         for (MyComp myComp : statcomp)
             myComp.draw();
-      
-        for (int i=skilllist.size()-1; i>=0; i--)
-            if(skilllist.get(i).update(this, arena) == -1)
-                skilllist.remove(i);
     }
 }

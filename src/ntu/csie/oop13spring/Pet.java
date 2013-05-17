@@ -7,7 +7,7 @@ public abstract class Pet extends POOPet {
     protected MyComp comp;
     protected ArrayList<MyComp> statcomp = new ArrayList<>();
     protected int State = POOConstant.STAT_DOWN;
-    protected ArrayList<TimerSkills> skilllist = new ArrayList<>();
+    
     protected HashMap<String, Object> register = new HashMap<>();
     protected HashMap<String, Integer> timer = new HashMap<>();
     protected Integer []actionkeys = new Integer[7];
@@ -43,22 +43,22 @@ public abstract class Pet extends POOPet {
         return timer.get(secret);
     }
     
-    public int damage(int number, int attack_type ){
+    public int damage(Arena arena, Pet from, int number, int attack_type ){
         if( !POOUtil.isStatus(State, POOConstant.STAT_GUARD) || POOUtil.isStatus(attack_type, POOSkillConstant.IGNORE_GUARD) ){
+            if(from.getName().equals(getName()))return getHP();
             TimerSkills skill = new BodyBlink();
-            boolean active = skill.require(this);
+            boolean active = skill.require(this, (Arena)arena);
             
             if(active){
-                skill.startTimer(null);
-                skilllist.add(skill);
-                
-                TimerSkills skill2 = new Message();
-                setRegister("Damage", String.format("%d", getHP()-number));
-                if(skill2.require(this)){
-                    skill2.startTimer(null);
-                    skilllist.add(skill2);
-                }
+                skill.startTimer();
+                arena.skilllist.add(skill);
             } 
+            TimerSkills skill2 = new Message();
+            setRegister("Damage", String.format("%d", getHP()-number));
+            if(skill2.require(this, (Arena)arena)){
+                skill2.startTimer();
+                arena.skilllist.add(skill2);
+            }
             setHP(number < 0 ? 0 : number);
         }
         return getHP();

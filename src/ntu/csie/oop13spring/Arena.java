@@ -12,6 +12,7 @@ public class Arena extends POOArena implements KeyListener{
     private MainWindow window = new MainWindow("POOArena");
     private java.util.Timer CLI_Timer = new java.util.Timer();
     protected ArrayList<Pet> allpets = new ArrayList<>(0);
+    protected ArrayList<TimerSkills> skilllist = new ArrayList<>();
 
 	public Arena(){
 		System.out.printf("Arena Established\nWritten by B99902006 Po-Hsien\n\n");
@@ -34,17 +35,16 @@ public class Arena extends POOArena implements KeyListener{
         window.setVisible(true);
         window.addKeyListener(this);
         
-        
-        String a = String.format("<h2>PET:%s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(0).getName(), "W", "D", "S", "A", "Q", "E", "F");
-        String b = String.format("<h2>PET:%s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(1).getName(), "I", "L", "K", "J", "U", "O", "P");
-        String c = String.format("<html><h1>Control Settings</h1><br/> %s <br/> %s </html>", a, b);
-        JOptionPane.showMessageDialog(window, c, null, JOptionPane.INFORMATION_MESSAGE);
+        String a = String.format("<h2>P1: %s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(0).getName(), "W", "D", "S", "A", "Q", "E", "F");
+        String b = String.format("<h2>P2: %s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(1).getName(), "I", "L", "K", "J", "U", "O", "P");
+        String c = String.format("<html><h1>Control Settings</h1><br/> %s <br/> %s <br/><style=\"color:red;\"><h2> defeat the monster and each other!!!</html>", a, b);
+        JOptionPane.showMessageDialog(window, c, null, JOptionPane.INFORMATION_MESSAGE);    
         
         CLI_Timer.schedule(new TimerTask() {
             @Override
             public void run() {
-               for (Pet pet : allpets)
-                   System.out.println(pet);
+//               for (Pet pet : allpets)
+//                   System.out.println(pet);
                 if(recentKey.size() > 0){
                     for (Integer integer : recentKey)
                         System.out.print(integer + " ");
@@ -63,19 +63,33 @@ public class Arena extends POOArena implements KeyListener{
 		for (Pet e: allpets){
 			if(e.getHP()>0){
 				POOAction act = e.act(this);
-                if(act != null && act.skill != null && act.dest != null) act.skill.act(act.dest);
+                if(act != null && act.skill != null && act.skill instanceof TimerSkills){
+                    skilllist.add(((TimerSkills)act.skill));
+                    ((TimerSkills)act.skill).startTimer();
+                }
+                else if(act != null && act.skill != null && act.dest != null) act.skill.act(act.dest);
 			}
             e.move(this);
 		}
         
+        for (int i=skilllist.size()-1; i>=0; i--)
+            if(skilllist.get(i).update(this) == -1)
+                skilllist.remove(i);
+        
+        
+        // check live or not
         for(int i=allpets.size()-1; i>=0; i--){
             if(allpets.get(i).getHP() <= 0){
                 allpets.get(i).comp.dispose();
                 allpets.remove(i);
             }
         }
+        HashSet<String> alive = new HashSet<>();
+        for (Pet pet : allpets) {
+            alive.add(pet.getName());
+        }
 
-        if(allpets.size() == 1){
+        if(alive.size() == 1){
             window.dispose();
             CLI_Timer.cancel();
             JOptionPane.showMessageDialog(window, String.format("<html><h1>%s</h1> Wins, Game over", allpets.get(0).getName()));
@@ -118,7 +132,7 @@ public class Arena extends POOArena implements KeyListener{
 	}
     public ArrayList<Pet> getAllPetsExcept(ArrayList<POOPet> blocklist){
         ArrayList<Pet> tmp = (ArrayList<Pet>) allpets.clone();
-        for(int i=tmp.size(); i>=0; i--)
+        for(int i=tmp.size()-1; i>=0; i--)
             if(blocklist.indexOf(tmp.get(i)) >= 0) tmp.remove(i);
         return tmp;
     }
@@ -224,8 +238,7 @@ class MyComp{
         return new Coordinate(t.x + t.height/2, t.y + t.width/2);
     }
     public void setCenter(POOCoordinate t){
-        coor.x = t.x - getBounds().height/2;
-        coor.y = t.y - getBounds().width/2;
+        setCoor(new Coordinate(t.x - getBounds().height/2, t.y - getBounds().width/2));
         draw();
     }
 }
