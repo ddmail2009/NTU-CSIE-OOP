@@ -160,7 +160,7 @@ public class Pet_Electivire extends Pet{
 
     @Override
     protected void initComp(Container container) {
-        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/4, container.getSize().width*3/4);
+        comp = new POOJComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/4, container.getSize().width*3/4);
         comp.setLimit(new Rectangle(0, 0, container.getSize().width, container.getSize().height));
     }
 
@@ -185,11 +185,11 @@ public class Pet_Electivire extends Pet{
         JPanel mp_back = new JPanel();
         mp_back.setBackground(Color.blue);
   
-        statcomp.add(new MyComp(container, hp, height*1/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, mp, height*3/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, hp_back, height*1/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, mp_back, height*3/5, width*7/20, width*6/10, height/5));
-        statcomp.add(new MyComp(container, label, height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
+        statcomp.add(new POOJComp(container, hp, height*1/5, width*7/20, width*6/10, height/5));
+        statcomp.add(new POOJComp(container, mp, height*3/5, width*7/20, width*6/10, height/5));
+        statcomp.add(new POOJComp(container, hp_back, height*1/5, width*7/20, width*6/10, height/5));
+        statcomp.add(new POOJComp(container, mp_back, height*3/5, width*7/20, width*6/10, height/5));
+        statcomp.add(new POOJComp(container, label, height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
     }
 
     @Override
@@ -204,7 +204,7 @@ public class Pet_Electivire extends Pet{
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);
         
-        for (MyComp myComp : statcomp)
+        for (POOJComp myComp : statcomp)
             myComp.draw();
     }
 }

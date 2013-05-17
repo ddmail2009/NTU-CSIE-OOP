@@ -8,7 +8,7 @@ import javax.swing.*;
 
 public class Attack extends TimerEffects{
     protected int speed = 6;
-    protected MyComp comp;
+    protected POOJComp comp;
     protected Line2D.Double Direction;
     protected BufferedImage pic = POOUtil.getImage(POOUtil.getCWD()+"images/attack/attack6.png");
     protected int damage = 1;
@@ -25,7 +25,7 @@ public class Attack extends TimerEffects{
         JLabel label = new JLabel(new ImageIcon(pic));
         
         Point objoffset = new Point(from.comp.getCoor().x + from.comp.getComp().getSize().height/2 - label.getIcon().getIconHeight()/2, from.comp.getCoor().y + from.comp.getComp().getSize().width/2 - label.getIcon().getIconWidth()/2);
-        comp = new MyComp(from.comp.getComp().getParent(), label, objoffset.x, objoffset.y);
+        comp = new POOJComp(from.comp.getComp().getParent(), label, objoffset.x, objoffset.y);
         comp.getComp().setVisible(false);
         counter = 0;
     }

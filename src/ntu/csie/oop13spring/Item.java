@@ -5,7 +5,7 @@ import javax.swing.*;
 
 
 public abstract class Item extends Effects{
-    protected MyComp comp;
+    protected POOJComp comp;
     public Item(Container contain, String str, String des) {
         super(str, des);
         initComp(contain);
@@ -37,7 +37,7 @@ class Meat extends Item{
 
     @Override
     protected void initComp(Container contain) {
-        comp = new MyComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/item1.png")), 0, 0);
+        comp = new POOJComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/item1.png")), 0, 0);
     }
 }
 
@@ -58,7 +58,7 @@ class MushRoom extends Item{
 
     @Override
     protected void initComp(Container contain) {
-        comp = new MyComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/mushroom.png")), 0, 0);
+        comp = new POOJComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/mushroom.png")), 0, 0);
     }
 }
 
@@ -79,6 +79,6 @@ class Soap extends Item{
 
     @Override
     protected void initComp(Container contain) {
-        comp = new MyComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/soap.png")), 0, 0);
+        comp = new POOJComp(contain, new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/soap.png")), 0, 0);
     }
 }

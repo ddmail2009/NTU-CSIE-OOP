@@ -5,18 +5,36 @@ import java.util.ArrayList;
 import javax.swing.*;
 import javax.swing.border.*;
 
-
 public abstract class Effects extends POOSkill{
     private String name, description;
+    /**
+     * pet who used the effect
+     */
     protected Pet from;
+    /**
+     * the arena instance
+     */
     protected Arena arena;
+    /**
+     * constructor of Effect
+     * @param str The Name
+     * @param des The Simple description
+     */
     protected Effects(String str, String des){
         name = str;
         description = des;
     }
-	public final String getName(){
+	/**
+     * This effect's name
+     * @return name
+     */
+    public final String getName(){
 		return name;
 	}
+    /**
+     * the effect description
+     * @return description
+     */
     public final String getDesString(){
         return description;
     }
@@ -48,7 +66,7 @@ class Move extends Effects{
 }
 
 class Guard extends TimerEffects{
-    private MyComp comp;
+    private POOJComp comp;
     
     Guard(){
         super("Guard", "Guard yourself");
@@ -64,7 +82,7 @@ class Guard extends TimerEffects{
 
     @Override
     public void startTimer() {
-        comp = new MyComp(from.comp.getComp().getParent(), new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/attack/shield.png")), 0, 0);
+        comp = new POOJComp(from.comp.getComp().getParent(), new JLabel(POOUtil.getIcon(POOUtil.getCWD()+"images/attack/shield.png")), 0, 0);
         comp.setCenter(from.comp.getCenter());
         counter = 0;
     }
@@ -142,7 +160,7 @@ class Jump extends TimerEffects{
 }
 
 class MissleAttack extends TimerEffects{
-    private ArrayList<MyComp> comp = new ArrayList<>(4);
+    private ArrayList<POOJComp> comp = new ArrayList<>(4);
     private ArrayList<Point> acceleration = new ArrayList<>(4);
     private int speed = 2;
 
@@ -157,7 +175,7 @@ class MissleAttack extends TimerEffects{
     @Override
     public void startTimer() {       
         for (int i = 0; i < 4; i++) {             
-            comp.add( new MyComp(from.comp.getComp().getParent(), new JPanel(), from.comp.getCoor().x+from.comp.getComp().getHeight()/2, from.comp.getCoor().y+from.comp.getComp().getWidth()/2, 10, 10) );
+            comp.add( new POOJComp(from.comp.getComp().getParent(), new JPanel(), from.comp.getCoor().x+from.comp.getComp().getHeight()/2, from.comp.getCoor().y+from.comp.getComp().getWidth()/2, 10, 10) );
             comp.get(i).getComp().setBorder(new LineBorder(Color.black));
             comp.get(i).getComp().setBackground(Color.red);
             comp.get(i).getComp().setVisible(false);
@@ -171,7 +189,7 @@ class MissleAttack extends TimerEffects{
         
         ArrayList<Pet> enemys = ((Arena)arena).getAllPetsExcept(from);
         for (int i=comp.size()-1; i>=0 ; i--) {
-            MyComp myComp = comp.get(i);
+            POOJComp myComp = comp.get(i);
             myComp.getComp().setVisible(true);
             
             POOCoordinate coor = myComp.getCenter();
@@ -214,7 +232,7 @@ class MissleAttack extends TimerEffects{
         
         
         if( counter == 80 || comp.size() == 0 ){
-            for (MyComp myComp : comp) myComp.dispose();
+            for (POOJComp myComp : comp) myComp.dispose();
             from.clearRegister("MissleAttack");
             return -1;
         }
@@ -280,7 +298,7 @@ class BodyBlink extends TimerEffects{
 }
 
 class Bombs extends TimerEffects{
-    private MyComp comp;
+    private POOJComp comp;
     private ImageIcon []images;
     ArrayList<Pet> blocklist = new ArrayList<>();
             
@@ -301,7 +319,7 @@ class Bombs extends TimerEffects{
         images[4] = new ImageIcon( POOUtil.getImage(POOUtil.getCWD() + "images/explode.png") );
         
         JLabel bomb = new JLabel(images[0]);
-        comp = new MyComp(from.comp.getComp().getParent(), bomb, 0, 0, bomb.getIcon().getIconHeight(), bomb.getIcon().getIconWidth());
+        comp = new POOJComp(from.comp.getComp().getParent(), bomb, 0, 0, bomb.getIcon().getIconHeight(), bomb.getIcon().getIconWidth());
         comp.setCoor(new Coordinate(from.comp.getCoor().x + from.comp.getComp().getSize().height/2 - bomb.getIcon().getIconHeight()/2 + 10, from.comp.getCoor().y + from.comp.getComp().getSize().width/2 - bomb.getIcon().getIconWidth()/2 + 10));
         comp.getComp().setVisible(false);
         counter = 0;
@@ -359,7 +377,7 @@ class Bombs extends TimerEffects{
 }
 
 class ShockWave extends TimerEffects{
-    private MyComp comp;
+    private POOJComp comp;
     ArrayList<Pet> blocklist = new ArrayList<>();
     
     public ShockWave(String str, String des) {
@@ -372,7 +390,7 @@ class ShockWave extends TimerEffects{
     @Override
     public void startTimer() {
         JPanel laser = new JPanel();
-        comp = new MyComp(from.comp.getComp().getParent(), laser, from.comp.getCoor().x + from.comp.getComp().getHeight()/2, from.comp.getCoor().y + from.comp.getComp().getWidth(), from.comp.getComp().getParent().getWidth(), 10);
+        comp = new POOJComp(from.comp.getComp().getParent(), laser, from.comp.getCoor().x + from.comp.getComp().getHeight()/2, from.comp.getCoor().y + from.comp.getComp().getWidth(), from.comp.getComp().getParent().getWidth(), 10);
         laser.setBackground(Color.red);
         comp.getComp().setVisible(false);
         blocklist.add(from);
@@ -426,7 +444,7 @@ class ShockWave extends TimerEffects{
 }
 
 class Message extends TimerEffects{
-    private MyComp comp;
+    private POOJComp comp;
     private String message;
     private Color color = new Color(0, 0, 0);
     
@@ -439,7 +457,7 @@ class Message extends TimerEffects{
 
     @Override
     public void startTimer() {
-        comp = new MyComp(from.comp.getComp().getParent(), new JLabel( message, JLabel.CENTER ), from.comp.getCoor().x-10, from.comp.getCoor().y-20, 20, 20);
+        comp = new POOJComp(from.comp.getComp().getParent(), new JLabel( message, JLabel.CENTER ), from.comp.getCoor().x-10, from.comp.getCoor().y-20, 20, 20);
         comp.getComp().setForeground(color);
         counter = 0;
     }

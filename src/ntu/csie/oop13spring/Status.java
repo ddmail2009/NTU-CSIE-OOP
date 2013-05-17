@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 public class Status extends TimerEffects{
     protected ImageIcon images = POOUtil.getIcon(POOUtil.getCWD()+"images/stat/poison2.png");
     protected Point offset = new Point(0, 0);
-    protected MyComp comp;
+    protected POOJComp comp;
     protected String secret = "Status";
     protected int lastTime = 100;
     protected int actInterval = 30;
@@ -21,7 +21,7 @@ public class Status extends TimerEffects{
 
     @Override
     public void startTimer() {
-        comp = new MyComp(from.comp.getComp().getParent(), new JLabel(images), from.comp.getCoor().x+from.comp.getBounds().height+offset.x, from.comp.getCoor().y+from.comp.getBounds().width+offset.y);
+        comp = new POOJComp(from.comp.getComp().getParent(), new JLabel(images), from.comp.getCoor().x+from.comp.getBounds().height+offset.x, from.comp.getCoor().y+from.comp.getBounds().width+offset.y);
     }
 
     @Override

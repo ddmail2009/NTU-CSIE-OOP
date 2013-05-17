@@ -5,20 +5,59 @@ import java.awt.event.KeyEvent;
 import java.util.*;
 
 public abstract class Pet extends POOPet {
-    protected MyComp comp;
-    protected ArrayList<MyComp> statcomp = new ArrayList<>();
+    protected POOJComp comp;
+    protected ArrayList<POOJComp> statcomp = new ArrayList<>();
     protected int State = POOConstant.STAT_DOWN;
     
+    /**
+     * The register for Time Effect
+     */
     protected HashMap<String, Object> register = new HashMap<>();
+    /**
+     * the registered timer for Time Effect
+     */
     protected HashMap<String, Integer> timer = new HashMap<>();
+    /**
+     * actionkeys of the pet, {UP, RIGHT, DOWN, LEFT, ATTACK, GUARD, JUMP}
+     */
     protected Integer []actionkeys = new Integer[7];
     
+    /**
+     * INITIALIZATION OF PET
+     * @param HP HP
+     * @param MP MP
+     * @param AGI AGI
+     * @param str NAME
+     */
     protected abstract void init(int HP, int MP, int AGI, String str);
+    /**
+     * initial the image icon 
+     */
     protected abstract void initImage();
+    /**
+     * Initialize Main Component
+     * @param container Swing Container
+     */
     protected abstract void initComp(Container container);
+    /**
+     * initial status component
+     * @param container Swing Container
+     */
     protected abstract void initStatComp(Container container);
+    /**
+     * get current pet direction
+     * @return current direction
+     */
     public abstract int GetCurrentDirection();
+    /**
+     * set current direction
+     * @param direction the direction
+     */
     public abstract void SetCurrentDirection(int direction);
+    /**
+     * draw the image of the pet
+     * @param arena arena
+     */
     public abstract void draw(Arena arena);
     
     public final int getState(){

@@ -5,8 +5,6 @@ import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
 
-
-
 /**
  * Arena class, control Pet and record key and item and skill
  * @author Dan
@@ -20,10 +18,20 @@ public class Arena extends POOArena implements KeyListener{
     private java.util.Timer CLI_Timer = new java.util.Timer();
     private ArrayList<Item> ItemList = new ArrayList<>();
     
+    /**
+     *  all pets whose still alive
+     */
     protected ArrayList<Pet> allpets = new ArrayList<>(0);
+    
+    /**
+     * Currently active skillList
+     */
     protected ArrayList<TimerEffects> skillList = new ArrayList<>();
 
-	public Arena(){
+	/**
+     *  Arena constructor, show Arena information in CLI
+     */
+    public Arena(){
 		System.out.printf("Arena Established\nWritten by B99902006 Po-Hsien\n\n");
 	}
     
@@ -70,6 +78,10 @@ public class Arena extends POOArena implements KeyListener{
         
 	}
 
+    /**
+     * let all pet decide their action and movement, random generate item and update current skill
+     * @return arena finished or not
+     */
     @Override
 	public boolean fight(){
 		if (first_run == true) init();
@@ -123,6 +135,9 @@ public class Arena extends POOArena implements KeyListener{
         else return true;
 	}
     
+    /**
+     * update the whole map, call each pet's draw method.
+     */
     @Override
 	public void show(){
         try {
@@ -134,7 +149,6 @@ public class Arena extends POOArena implements KeyListener{
         for (Pet pet : allpets)
             pet.draw(this);
         
-        // check live or not
         for(int i=allpets.size()-1; i>=0; i--){
             if(allpets.get(i).getHP() <= 0){
                 allpets.get(i).comp.dispose();
@@ -143,34 +157,42 @@ public class Arena extends POOArena implements KeyListener{
         }
 	}
     
+    /**
+     * Get the pet's position.
+     * @param p Pet to be searched
+     * @return the coordinate
+     */
     @Override
 	public POOCoordinate getPosition(POOPet p){
 		return ((Pet)p).comp.getCoor();
 	}
-    protected HashSet<Integer> getKey(){
-        return (HashSet<Integer>) key.clone();
-    }
-    protected Integer[] getRecentKey(){
-        Integer []a = new Integer[0];
-        return recentKey.toArray(a);
-    }
-    public int searchPosition(POOCoordinate t){
-		ArrayList<Pet> parr = allpets;
-		for (int i=0; i<parr.size(); i++)
-			if (t.equals(getPosition(parr.get(i)))) return i;
-		return -1;
-	}
+    /**
+     * Get all pets except certain pet
+     * @param blocklist pet which want to exclude from search
+     * @return pet which match the query
+     */
     public ArrayList<Pet> getAllPetsExcept(ArrayList<POOPet> blocklist){
         ArrayList<Pet> tmp = (ArrayList<Pet>) allpets.clone();
         for(int i=tmp.size()-1; i>=0; i--)
             if(blocklist.indexOf(tmp.get(i)) >= 0) tmp.remove(i);
         return tmp;
     }
+    /**
+     * Get all pets except certain pet
+     * @param pet pet which want to exclude from search
+     * @return pet which match the query
+     */
     public ArrayList<Pet> getAllPetsExcept(Pet pet){
         ArrayList<Pet> tmp = (ArrayList<Pet>) allpets.clone();
         tmp.remove(pet);
         return tmp;
     }
+    /**
+     * Search area for Pet
+     * @param t area you want to search
+     * @param blockList element you don't want to be returned
+     * @return the index of Pet which is in the area
+     */
     public int searchBlockPosition(Rectangle t, ArrayList<Pet> blockList){        
         ArrayList<Pet> parr = allpets;
         for (int i = 0; i < parr.size(); i++) {
@@ -181,6 +203,22 @@ public class Arena extends POOArena implements KeyListener{
             if(POOUtil.isBlockInside(t, tmp))return i;
         }
         return -1;
+    }
+    
+    /**
+     * get the current pressed key
+     * @return current pressed key
+     */
+    protected HashSet<Integer> getKey(){
+        return (HashSet<Integer>) key.clone();
+    }
+    /**
+     * Get recent released key
+     * @return recent released key
+     */
+    protected Integer[] getRecentKey(){
+        Integer []a = new Integer[0];
+        return recentKey.toArray(a);
     }
     
     @Override
@@ -203,68 +241,4 @@ public class Arena extends POOArena implements KeyListener{
         }
     }
 }
-class MyComp{
-    private Container contain;
-    private JComponent comp;
-    private POOCoordinate coor;
-    private Rectangle limit = null;
-    
-    public MyComp(Container contain, JComponent comp, int x, int y){
-        init(contain, comp, x, y, comp.getPreferredSize().width, comp.getPreferredSize().height);
-    }
-    public MyComp(Container contain, JComponent comp, int x, int y, int width, int height){
-        init(contain, comp, x, y, width, height);
-    }
-    private void init(Container contain, JComponent comp, int x, int y, int width, int height){
-        this.contain = contain;
-        if(this.contain != null)this.contain.add(comp);
-        this.comp = comp;
-        this.comp.setSize(new Dimension(width, height));
-        this.coor = new Coordinate(x, y);
-        draw();
-    }
-    public void setLimit(Rectangle rec){
-        limit = (Rectangle)(rec.clone());
-    }
-    public JComponent getComp(){
-        return comp;
-    }
-    public POOCoordinate getCoor(){
-        return new Coordinate(coor.x, coor.y);
-    }
-    protected void setCoorForce(POOCoordinate coor){
-        this.coor.x = coor.x;
-        this.coor.y = coor.y;
-    }
-    protected void setCoor(POOCoordinate coor){  
-        Insets insets = contain != null ? contain.getInsets() : new Insets(0, 0, 0, 0);
-        if(limit != null && POOUtil.isInside(limit.y, coor.y+insets.left, limit.width-this.comp.getSize().width))this.coor.y = coor.y;
-        else if(limit == null)this.coor.y = coor.y;
-        if(limit != null && POOUtil.isInside(limit.x, coor.x+insets.top, limit.height-this.comp.getSize().height))this.coor.x = coor.x;
-        else if(limit == null)this.coor.x = coor.x;
-    }
-    public void draw(){
-        Insets insets = contain != null ? contain.getInsets() : new Insets(0, 0, 0, 0);
-        comp.setBounds(coor.y+insets.left, coor.x+insets.top, comp.getSize().width, comp.getSize().height);
-    }
-    public void dispose(){
-        comp.setVisible(false);
-        if(contain != null) contain.remove(comp);
-    }
-    public Rectangle getBounds(){
-        Rectangle s = new Rectangle(comp.getBounds());
-        int tmp = s.x;
-        s.x = s.y;
-        s.y = tmp;
-        return s;
-    }
-    
-    public POOCoordinate getCenter(){
-        Rectangle t = getBounds();
-        return new Coordinate(t.x + t.height/2, t.y + t.width/2);
-    }
-    public void setCenter(POOCoordinate t){
-        setCoor(new Coordinate(t.x - getBounds().height/2, t.y - getBounds().width/2));
-        draw();
-    }
-}
+
