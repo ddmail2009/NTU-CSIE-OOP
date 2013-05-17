@@ -22,9 +22,9 @@ public class Pet_Magmortar extends Pet{
         actionkeys[1] = KeyEvent.VK_D;
         actionkeys[2] = KeyEvent.VK_S;
         actionkeys[3] = KeyEvent.VK_A;
-        actionkeys[4] = KeyEvent.VK_Q;
-        actionkeys[5] = KeyEvent.VK_E;
-        actionkeys[6] = KeyEvent.VK_F;
+        actionkeys[4] = KeyEvent.VK_F;
+        actionkeys[5] = KeyEvent.VK_G;
+        actionkeys[6] = KeyEvent.VK_H;
         this.mp_regeneration = new Count_Task(30/getAGI()) {
             @Override
             public int task() { 
@@ -32,8 +32,6 @@ public class Pet_Magmortar extends Pet{
             }
         };
 	}
-    
-    
     @Override
     protected void initImage(){
         images = new BufferedImage[4];
@@ -42,7 +40,6 @@ public class Pet_Magmortar extends Pet{
             images[i] = POOUtil.getImage(a);
         }
     }
-    
     @Override
     protected void init(int HP, int MP, int AGI, String str){
         setHP(HP);
@@ -51,7 +48,7 @@ public class Pet_Magmortar extends Pet{
         setName(str);
     }
     
-    private Skills getSkills(int keycode){
+    private Effects getSkills(int keycode){
         for(int i=0; i<4; i++)
             if(actionkeys[i] == keycode) return new Move();
         if(actionkeys[4] == keycode)return new Attack();
@@ -60,7 +57,7 @@ public class Pet_Magmortar extends Pet{
         return null;
     }
 
-    private Skills getComboSkills(Integer []recentKey){
+    private Effects getComboSkills(Integer []recentKey){
         int [][]a = {
             {actionkeys[5], actionkeys[0], actionkeys[4]},
             {actionkeys[5], actionkeys[1], actionkeys[6]},
@@ -96,60 +93,42 @@ public class Pet_Magmortar extends Pet{
     }
     
     @Override
-	protected POOAction act(POOArena oldarena){
+	protected POOAction act(POOArena arena){
         mp_regeneration.run();
-        
-        for (Map.Entry<String, Integer> ti : timer.entrySet()) {
-            String string = ti.getKey();
-            Integer integer = ti.getValue();
-            timer.put(string, integer+1);
-        }
         
         POOAction e = new POOAction();
         e.skill = null;
         e.dest = null;
         
-        Arena arena = (Arena)oldarena;
-        e.skill = getComboSkills(arena.getRecentKey());
-        if(e.skill != null){
-            if( ((Skills)e.skill).require(this, arena) ){
-                return e;
-            }
-        }
+        e.skill = getComboSkills(((Arena)arena).getRecentKey());
+        if( e.skill instanceof TimerEffects && ((TimerEffects)e.skill).require(this, (Arena)arena) )
+            return e;
 
-        HashSet<Integer> keys = arena.getKey();
-        int key = 0;
-        for (Integer integer : keys){
-            Skills t = getSkills(integer);
-            if(t != null && !(t instanceof Move)){
-                e.skill = t;
-                if(t.require(this, arena)){
-                    return e;
-                }
-            }
+        ((Arena)arena).getKey();
+        for (Integer integer : ((Arena)arena).getKey()){
+            e.skill = getSkills(integer);
+            if( e.skill != null && !(e.skill instanceof Move) )
+                if(((TimerEffects)e.skill).require(this, (Arena)arena)) return e;
         }
         return null;
 	}
 
     @Override
-	protected POOCoordinate move(POOArena oldarena){
-        Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.getKey();
+	protected POOCoordinate move(POOArena arena){
+        HashSet<Integer> keys = ((Arena)arena).getKey();
         if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
         
         int key = 0;
+        POOCoordinate coor = comp.getCoor();
         for (Iterator<Integer> it = keys.iterator(); it.hasNext();) {
             Integer integer = it.next();
             
             if(getSkills(integer) instanceof Move) {
                 key = integer;
-
-                POOCoordinate coor = comp.getCoor();
                 if(key == actionkeys[0]) coor.x -= getAGI();
                 if(key == actionkeys[1]) coor.y += getAGI();
                 if(key == actionkeys[2]) coor.x += getAGI();
                 if(key == actionkeys[3]) coor.y -= getAGI();
-                comp.setCoor(coor);
             }
         }
 
@@ -157,7 +136,7 @@ public class Pet_Magmortar extends Pet{
         else if(key == actionkeys[1]) SetCurrentDirection(POOConstant.STAT_RIGHT);
         else if(key == actionkeys[2]) SetCurrentDirection(POOConstant.STAT_DOWN);
         else if(key == actionkeys[3]) SetCurrentDirection(POOConstant.STAT_LEFT);
-		return null;
+        return coor;
 	}
     
     @Override
@@ -216,6 +195,8 @@ public class Pet_Magmortar extends Pet{
             ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[POOConstant.Direction_MAP.get(GetCurrentDirection())]));
         comp.draw();
         
+        for (String string : timer.keySet()) 
+            timer.put(string, timer.get(string)+1);
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);

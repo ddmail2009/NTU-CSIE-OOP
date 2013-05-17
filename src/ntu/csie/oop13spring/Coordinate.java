@@ -1,6 +1,6 @@
 package ntu.csie.oop13spring;
 
-public class Coordinate extends POOCoordinate{
+public class Coordinate extends POOCoordinate {
 	public Coordinate(int x, int y){
 		this.x = x;
 		this.y = y;
@@ -19,5 +19,9 @@ public class Coordinate extends POOCoordinate{
     @Override
     public String toString() {
         return "Coordinate: x="+x+" y="+y;
+    }
+    
+    public double distance(POOCoordinate coor){
+        return Math.pow(x-coor.x, 2) + Math.pow(y-coor.y, 2);
     }
 }

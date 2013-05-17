@@ -7,4 +7,5 @@ PET3_CLASS=ntu.csie.oop13spring.Monster
 PET4_CLASS=ntu.csie.oop13spring.Monster
 PET5_CLASS=ntu.csie.oop13spring.Monster
 
+javac -cp hw4.jar -d . @source_files
 java -jar hw4.jar $ARENA_CLASS $PET1_CLASS $PET2_CLASS $PET3_CLASS $PET4_CLASS $PET5_CLASS

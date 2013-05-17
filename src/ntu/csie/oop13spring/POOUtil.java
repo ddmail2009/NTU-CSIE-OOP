@@ -4,13 +4,21 @@
  */
 package ntu.csie.oop13spring;
 
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
 import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 
 public class POOUtil {
+
+    static double ABSLimit(double x, int agi) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
     private POOUtil(){}
     
     public static String getCWD(){
@@ -34,6 +42,15 @@ public class POOUtil {
             return null;
         }
     }
+    public static ImageIcon getIcon(String path){
+        try {
+            return new ImageIcon(new URL("file:/"+path));
+        } catch (MalformedURLException ex) {
+            System.err.println("Can't read "+path);
+            ex.printStackTrace();
+            return null;
+        }
+    }
     public static BufferedImage flipHorizontal(BufferedImage img){
         AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
         tx.translate(-img.getWidth(), 0);
@@ -51,6 +68,21 @@ public class POOUtil {
     }
     public static int ABSLimit(int n, int limit){
         return n>limit ? limit : (n < -limit ? -limit : n);
+    }
+    public static boolean isBlockInside(Rectangle a, Rectangle b){
+        int a_area = a.height*a.width;
+        int b_area = b.height*b.width;
+        Rectangle small = a, big = b;
+        if(b_area < a_area){
+            Rectangle tmp = small;
+            small = big;
+            big = tmp;
+        }
+        if(isInside(big.x, small.x, big.x+big.height) && isInside(big.y, small.y, big.y+big.width))return true;
+        if(isInside(big.x, small.x, big.x+big.height) && isInside(big.y, small.y+small.width, big.y+big.width))return true;
+        if(isInside(big.x, small.x+small.height, big.x+big.height) && isInside(big.y, small.y, big.y+big.width))return true;
+        if(isInside(big.x, small.x+small.height, big.x+big.height) && isInside(big.y, small.y+small.width, big.y+big.width))return true;
+        return false;
     }
 }
 

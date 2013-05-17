@@ -5,7 +5,7 @@ import java.awt.event.*;
 import java.awt.image.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.LineBorder;
 
 public class Pet_Electivire extends Pet{
     private BufferedImage []images;
@@ -18,13 +18,13 @@ public class Pet_Electivire extends Pet{
         
 		init(100, 100, 3, "Electivire");
         
-        actionkeys[0] = KeyEvent.VK_I;
-        actionkeys[1] = KeyEvent.VK_L;
-        actionkeys[2] = KeyEvent.VK_K;
-        actionkeys[3] = KeyEvent.VK_J;
-        actionkeys[4] = KeyEvent.VK_U;
-        actionkeys[5] = KeyEvent.VK_O;
-        actionkeys[6] = KeyEvent.VK_P;
+        actionkeys[0] = KeyEvent.VK_UP;
+        actionkeys[1] = KeyEvent.VK_RIGHT;
+        actionkeys[2] = KeyEvent.VK_DOWN;
+        actionkeys[3] = KeyEvent.VK_LEFT;
+        actionkeys[4] = KeyEvent.VK_COMMA;
+        actionkeys[5] = KeyEvent.VK_PERIOD;
+        actionkeys[6] = KeyEvent.VK_SLASH;
         
         this.mp_regeneration = new Count_Task(30/getAGI()) {
             @Override
@@ -52,7 +52,7 @@ public class Pet_Electivire extends Pet{
         setName(str);
     }
     
-    private Skills getSkills(int keycode){
+    private Effects getSkills(int keycode){
         for(int i=0; i<4; i++)
             if(actionkeys[i] == keycode) return new Move();
         if(actionkeys[4] == keycode)return new Attack();
@@ -61,7 +61,7 @@ public class Pet_Electivire extends Pet{
         return null;
     }
 
-    private Skills getComboSkills(Integer []recentKey){
+    private Effects getComboSkills(Integer []recentKey){
         int [][]a = {
             {actionkeys[5], actionkeys[0], actionkeys[4]},
             {actionkeys[5], actionkeys[1], actionkeys[6]},
@@ -97,54 +97,41 @@ public class Pet_Electivire extends Pet{
     }
     
     @Override
-	protected POOAction act(POOArena oldarena){
+	protected POOAction act(POOArena arena){
         mp_regeneration.run();
         
         POOAction e = new POOAction();
         e.skill = null;
         e.dest = null;
         
-        Arena arena = (Arena)oldarena;
-        e.skill = getComboSkills(arena.getRecentKey());
-        if(e.skill != null){
-            if( ((Skills)e.skill).require(this, arena) ){
-                return e;
-            }
-        }
-        
-        
-        HashSet<Integer> keys = arena.getKey();
-        int key = 0;
-        for (Integer integer : keys) 
-            if( getSkills(integer) != null && !(getSkills(integer) instanceof Move) )key = integer;
-        
-        e.skill = getSkills(key);
-        e.dest = null;
-
-        if( e.skill != null && ((Skills)e.skill).require(this, arena) ){
+        e.skill = getComboSkills(((Arena)arena).getRecentKey());
+        if( e.skill instanceof TimerEffects && ((TimerEffects)e.skill).require(this, (Arena)arena) )
             return e;
+
+        for (Integer integer : ((Arena)arena).getKey()){
+            e.skill = getSkills(integer);
+            if( e.skill != null && !(e.skill instanceof Move) )
+                if(((TimerEffects)e.skill).require(this, (Arena)arena)) return e;
         }
-        else e.skill = null;
         return null;
 	}
 
     @Override
-	protected POOCoordinate move(POOArena oldarena){
-        Arena arena = (Arena)oldarena;
-        HashSet<Integer> keys = arena.getKey();
+	protected POOCoordinate move(POOArena arena){
+        HashSet<Integer> keys = ((Arena)arena).getKey();
         if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
         
         int key = 0;
-        for (Integer integer : keys) {
+        POOCoordinate coor = comp.getCoor();
+        for (Iterator<Integer> it = keys.iterator(); it.hasNext();) {
+            Integer integer = it.next();
+            
             if(getSkills(integer) instanceof Move) {
                 key = integer;
-
-                POOCoordinate coor = comp.getCoor();
                 if(key == actionkeys[0]) coor.x -= getAGI();
                 if(key == actionkeys[1]) coor.y += getAGI();
                 if(key == actionkeys[2]) coor.x += getAGI();
                 if(key == actionkeys[3]) coor.y -= getAGI();
-                comp.setCoor(coor);
             }
         }
 
@@ -152,7 +139,7 @@ public class Pet_Electivire extends Pet{
         else if(key == actionkeys[1]) SetCurrentDirection(POOConstant.STAT_RIGHT);
         else if(key == actionkeys[2]) SetCurrentDirection(POOConstant.STAT_DOWN);
         else if(key == actionkeys[3]) SetCurrentDirection(POOConstant.STAT_LEFT);
-		return null;
+		return coor;
 	}
     
     @Override
@@ -211,11 +198,8 @@ public class Pet_Electivire extends Pet{
             ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[POOConstant.Direction_MAP.get(GetCurrentDirection())]));
         comp.draw();
         
-        for (Map.Entry<String, Integer> ti : timer.entrySet()) {
-            String string = ti.getKey();
-            Integer integer = ti.getValue();
-            timer.put(string, integer+1);
-        }
+        for (String string : timer.keySet()) 
+            timer.put(string, timer.get(string)+1);
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);

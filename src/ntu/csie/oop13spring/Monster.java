@@ -1,16 +1,13 @@
 package ntu.csie.oop13spring;
 
 import java.awt.*;
-import java.awt.image.*;
-import java.net.URL;
 import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
 public class Monster extends Pet{
-    private BufferedImage images;
-    
-    Count_Task mp_regeneration;
+    protected ImageIcon images;
+    protected Count_Task mp_regeneration;
      
 	public Monster(){
         super();
@@ -25,7 +22,7 @@ public class Monster extends Pet{
     
     @Override
     protected void initImage(){
-        images = POOUtil.getImage(POOUtil.getCWD() + "images/Volcarona.gif");
+        images = POOUtil.getIcon(POOUtil.getCWD() + "images/Chansey.gif");
     }
     
     @Override
@@ -36,12 +33,11 @@ public class Monster extends Pet{
         setName(str);
     }
     
-    private Skills getSkills(int keycode){
-        if(counter % 40 == 0)return new Attack();
-        else return null;
+    protected Effects getSkills(int keycode){
+        return new Attack();
     }
 
-    private Skills getComboSkills(Integer []recentKey){
+    protected Effects getComboSkills(Integer []recentKey){
         return null;
     }
     
@@ -66,18 +62,21 @@ public class Monster extends Pet{
         for(int i=0; i<parr.size(); i++)
             if( Math.pow(coor.x-parr.get(i).comp.getCoor().x, 2) + Math.pow(coor.y-parr.get(i).comp.getCoor().y, 2) < Math.pow(coor.x-parr.get(min).comp.getCoor().x, 2) + Math.pow(coor.y-parr.get(min).comp.getCoor().y, 2) )
                 min = i;
-        POOCoordinate t = parr.get(min).comp.getCenter();
+        
+        POOCoordinate t;        
+        if(POOUtil.isInside(0, min, parr.size()))
+             t = parr.get(min).comp.getCenter();
+        else t = new Coordinate(coor.x, coor.y);
         
         setRegister("AttackDirection", new Coordinate(t.x-coor.x, t.y - coor.y));
-        if( e.skill != null && ((Skills)e.skill).require(this, (Arena) arena) ){
+        if( e.skill != null && ((TimerEffects)e.skill).require(this, (Arena) arena) ){
             return e;
-            
         }
         else e.skill = null;
         return null;
 	}
 
-    private Point acceleration = new Point(0, 0);
+    private Coordinate acceleration = new Coordinate(0, 0);
     int counter = 0;
     @Override
 	protected POOCoordinate move(POOArena oldarena){
@@ -90,11 +89,13 @@ public class Monster extends Pet{
                 if(pet.getName().equals("Monster")) block.add(pet);
             }
             ArrayList<Pet> parr = ((Arena)oldarena).getAllPetsExcept(block);
-
+            if(parr.size() == 0) return comp.getCoor();
+            
             int min = 0;
             for(int i=0; i<parr.size(); i++)
-                if( Math.pow(coor.x-parr.get(i).comp.getCoor().x, 2) + Math.pow(coor.y-parr.get(i).comp.getCoor().y, 2) < Math.pow(coor.x-parr.get(min).comp.getCoor().x, 2) + Math.pow(coor.y-parr.get(min).comp.getCoor().y, 2) )
+                if( ((Coordinate)coor).distance(parr.get(i).comp.getCoor()) < ((Coordinate)coor).distance(parr.get(min).comp.getCoor()) )
                     min = i;
+            
             Pet target = parr.get(min);
             POOCoordinate t = target.comp.getCenter();
             if(t.x < coor.x) acceleration.x -= 1;
@@ -136,14 +137,7 @@ public class Monster extends Pet{
 
     @Override
     protected void initComp(Container container) {
-        JLabel label;
-        try{
-            label = new JLabel(new ImageIcon(new URL("file:/"+POOUtil.getCWD()+"images/Volcarona.gif")));
-        }catch(Exception e){
-            label = new JLabel(new ImageIcon(images));
-        }
-        
-        comp = new MyComp(container, label, container.getSize().height/2 + (int)(Math.random()*10), (int)(container.getSize().width*Math.random()*3/4) + (int)(Math.random()*10));
+        comp = new MyComp(container, new JLabel(images), container.getSize().height/2 + (int)(Math.random()*10), (int)(container.getSize().width*Math.random()*3/4) + (int)(Math.random()*10));
         comp.setLimit(new Rectangle(0, 0, container.getSize().width, container.getSize().height));
     }
 
@@ -152,12 +146,7 @@ public class Monster extends Pet{
         int height = container.getSize().height;
         int width = container.getSize().width;
         
-        JLabel label;
-        try{
-            label = new JLabel(new ImageIcon(new URL("file:/"+POOUtil.getCWD()+"images/Volcarona.gif")));
-        }catch(Exception e){
-            label = new JLabel(new ImageIcon(images));
-        }
+        JLabel label = new JLabel(images);
         
         JLabel hp = new JLabel("HP");
         hp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -182,8 +171,6 @@ public class Monster extends Pet{
 
     @Override
     public void draw(Arena arena) {
-//        if(POOUtil.isInside(0, POOConstant.Direction_MAP.get(GetCurrentDirection()), 4)) 
-//            ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[POOConstant.Direction_MAP.get(GetCurrentDirection())]));
         comp.draw();
         
         for (Map.Entry<String, Integer> ti : timer.entrySet()) {
@@ -198,7 +185,38 @@ public class Monster extends Pet{
         
         for (MyComp myComp : statcomp)
             myComp.draw();
-      
-        
+    }
+}
+
+
+class FireMonster extends Monster{    
+	public FireMonster(){
+        super();
+	}
+    
+    @Override
+    protected void initImage(){
+        images = POOUtil.getIcon(POOUtil.getCWD() + "images/Volcarona.gif");
+    }
+    
+    @Override
+    protected Effects getSkills(int keycode){
+        return new FireAttack();
+    }
+}
+
+class PoisonMonster extends Monster{    
+	public PoisonMonster(){
+        super();
+	}
+    
+    @Override
+    protected void initImage(){
+        images = POOUtil.getIcon(POOUtil.getCWD() + "images/Gastly.gif");
+    }
+    
+    @Override
+    protected Effects getSkills(int keycode){
+        return new PoisonAttack();
     }
 }

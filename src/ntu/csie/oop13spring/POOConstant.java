@@ -35,4 +35,5 @@ public final class POOConstant {
 final class POOSkillConstant{
     public static final int NORMAL = 0;
     public static final int IGNORE_GUARD = 1;
+    public static final int SELF_ATTACK = 1<<1;
 }
