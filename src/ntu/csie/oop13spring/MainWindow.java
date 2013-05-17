@@ -25,7 +25,8 @@ public class MainWindow extends javax.swing.JFrame {
         Main_Panel = new JPanel();
         Stat_Panel = new JPanel();
         Stat_PanelArr = new JPanel[8];
-        Combat_Panel = new ImagePanel(POOUtil.getCWD() + "images/background.png");
+//        Combat_Panel = new ImagePanel(POOUtil.getCWD() + "images/background.png");
+        Combat_Panel = new JPanel();
         jMenuBar1 = new JMenuBar();
         jMenu1 = new JMenu();
         jMenu3 = new JMenu();
@@ -35,7 +36,7 @@ public class MainWindow extends javax.swing.JFrame {
         setResizable(false);
 
         Main_Panel.setPreferredSize(new java.awt.Dimension(800, 551));
-        Main_Panel.setLayout(null);
+            Main_Panel.setLayout(null);
 
         Stat_Panel.setBackground(new java.awt.Color(153, 153, 255));
         Stat_Panel.setPreferredSize(new java.awt.Dimension(1000, 100));

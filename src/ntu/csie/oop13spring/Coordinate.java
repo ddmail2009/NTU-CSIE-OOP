@@ -15,4 +15,9 @@ public class Coordinate extends POOCoordinate{
 	public boolean equals(POOCoordinate other){
 		return x == other.x && y == other.y;
 	}
+
+    @Override
+    public String toString() {
+        return "Coordinate: x="+x+" y="+y;
+    }
 }

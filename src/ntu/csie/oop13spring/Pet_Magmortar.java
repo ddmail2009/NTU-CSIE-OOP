@@ -7,27 +7,38 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class Pet_Foe extends Pet{
+public class Pet_Magmortar extends Pet{
     private BufferedImage []images;
-    private Integer []actionkeys = {KeyEvent.VK_UP, KeyEvent.VK_RIGHT, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_L, KeyEvent.VK_SEMICOLON, KeyEvent.VK_QUOTE};
     
-    Count_Task mp_regeneration = new Count_Task(10) {
-        @Override
-        public int task() { 
-            return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
-        }
-    };
+    
+    Count_Task mp_regeneration;
      
-	public Pet_Foe(){
+	public Pet_Magmortar(){
         super();
-		init(100, 100, 3, "Foe");
+        
+		init(100, 100, 3, "Magmortar");
+        
+        actionkeys[0] = KeyEvent.VK_W;
+        actionkeys[1] = KeyEvent.VK_D;
+        actionkeys[2] = KeyEvent.VK_S;
+        actionkeys[3] = KeyEvent.VK_A;
+        actionkeys[4] = KeyEvent.VK_Q;
+        actionkeys[5] = KeyEvent.VK_E;
+        actionkeys[6] = KeyEvent.VK_F;
+        this.mp_regeneration = new Count_Task(30/getAGI()) {
+            @Override
+            public int task() { 
+                return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
+            }
+        };
 	}
+    
     
     @Override
     protected void initImage(){
-        images = new BufferedImage[3];
-        for(int i=0; i<3; i++){
-            String a = String.format("%sfly_monster%d.png", POOUtil.getCWD()+"images/", i+1);
+        images = new BufferedImage[4];
+        for(int i=0; i<images.length; i++){
+            String a = String.format("%sMagmortar%d.png", POOUtil.getCWD()+"images/", i);
             images[i] = POOUtil.getImage(a);
         }
     }
@@ -53,12 +64,12 @@ public class Pet_Foe extends Pet{
         int [][]a = {
             {actionkeys[5], actionkeys[0], actionkeys[4]},
             {actionkeys[5], actionkeys[1], actionkeys[6]},
-            {actionkeys[5], actionkeys[3], actionkeys[6]}
+            {actionkeys[5], actionkeys[3], actionkeys[6]},
+            {actionkeys[5], actionkeys[2], actionkeys[4]}
         };
         
         ArrayList<Integer> recent = new ArrayList<>();
-        for (int i=0; i<recentKey.length; i++)
-            recent.add(recentKey[i]);
+        recent.addAll(Arrays.asList(recentKey));
         for (int i=recent.size()-1; i>=0; i--){
             int match = 0;
             for (int j = 0; j < actionkeys.length; j++)
@@ -66,23 +77,17 @@ public class Pet_Foe extends Pet{
             if(match == 0) recent.remove(i);
         }
         
-        
         for(int i=0; i<recent.size(); i++){
             for(int j=0; j<a.length; j++){
                 int match = 0;
-                for(int k=0; k<a[j].length; k++){
-                    try{
-                        if(i+k < recent.size() && recent.get(i+k) == a[j][k]) match += 1;
-                    }catch(Exception e){
-                        System.out.printf("%d %d %d\n", i, j, k);
-                        e.printStackTrace();
-                    }
-                }
+                for(int k=0; k<a[j].length; k++)
+                    if(i+k < recent.size() && recent.get(i+k) == a[j][k]) match += 1;
                 if(match == a[j].length){
                     switch(j){
                         case 0: return new MissleAttack();
                         case 1: return new Bombs();
                         case 2: return new Bombs();
+                        case 3: return new ShockWave();
                     }
                 }
             }
@@ -91,13 +96,14 @@ public class Pet_Foe extends Pet{
     }
     
     @Override
-    public void setActionkeys(Integer []actionkeys){
-        System.arraycopy(actionkeys, 0, this.actionkeys, 0, this.actionkeys.length);
-    }
-    
-    @Override
 	protected POOAction act(POOArena oldarena){
         mp_regeneration.run();
+        
+        for (Map.Entry<String, Integer> ti : timer.entrySet()) {
+            String string = ti.getKey();
+            Integer integer = ti.getValue();
+            timer.put(string, integer+1);
+        }
         
         POOAction e = new POOAction();
         e.skill = null;
@@ -110,27 +116,26 @@ public class Pet_Foe extends Pet{
                 if(e.skill instanceof TimerSkills){
                      skilllist.add(((TimerSkills)e.skill));
                      ((TimerSkills)e.skill).startTimer(arena);
-                     return e;
+                }
+                return e;
+            }
+        }
+
+        HashSet<Integer> keys = arena.getKey();
+        int key = 0;
+        for (Integer integer : keys){
+            Skills t = getSkills(integer);
+            if(t != null && !(t instanceof Move)){
+                e.skill = t;
+                if(t.require(this)){
+                    if(t instanceof TimerSkills){
+                        skilllist.add(((TimerSkills)e.skill));
+                        ((TimerSkills)e.skill).startTimer(arena);
+                    }
+                    return e;
                 }
             }
         }
-        
-        
-        HashSet<Integer> keys = arena.getKey();
-        int key = 0;
-        for (Integer integer : keys) 
-            if( getSkills(integer) != null && !(getSkills(integer) instanceof Move) )key = integer;
-        
-        e.skill = getSkills(key);
-        e.dest = null;
-
-        if( e.skill != null && ((Skills)e.skill).require(this) ){;
-            if(e.skill instanceof TimerSkills){
-                 skilllist.add(((TimerSkills)e.skill));
-                 ((TimerSkills)e.skill).startTimer(arena);
-            }
-        }
-        else e.skill = null;
         return null;
 	}
 
@@ -179,8 +184,8 @@ public class Pet_Foe extends Pet{
 
     @Override
     protected void initComp(Container container) {
-        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height-50, container.getSize().width*3/4);
-        comp.setLimit(new Rectangle(container.getSize().height/2, 0, container.getSize().width, container.getSize().height));
+        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/4, container.getSize().width/4);
+        comp.setLimit(new Rectangle(0, 0, container.getSize().width, container.getSize().height));
     }
 
     @Override
@@ -188,7 +193,7 @@ public class Pet_Foe extends Pet{
         int height = container.getSize().height;
         int width = container.getSize().width;
         
-        JLabel label = new JLabel(new ImageIcon(images[0]));
+        JLabel label = new JLabel(new ImageIcon(images[2]));
         
         JLabel hp = new JLabel("HP");
         hp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -211,12 +216,12 @@ public class Pet_Foe extends Pet{
         statcomp.add(new MyComp(container, label, height/2-label.getIcon().getIconHeight()/2, width*3/20-label.getIcon().getIconWidth()/2));
     }
 
-    int image_count = 0;
     @Override
     public void draw(Arena arena) {
-        image_count = (image_count+1)%(images.length*10);
-        ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[image_count/10]));
+        if(POOUtil.isInside(0, POOConstant.Direction_MAP.get(GetCurrentDirection()), 4)) 
+            ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[POOConstant.Direction_MAP.get(GetCurrentDirection())]));
         comp.draw();
+        
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);

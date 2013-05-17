@@ -4,7 +4,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.*;
 import javax.swing.*;
-import javax.swing.border.LineBorder;
 
 public class Arena extends POOArena implements KeyListener{
 	private boolean first_run = true;
@@ -12,33 +11,39 @@ public class Arena extends POOArena implements KeyListener{
     private ArrayList<Integer> recentKey = new ArrayList<>();
     private MainWindow window = new MainWindow("POOArena");
     private java.util.Timer CLI_Timer = new java.util.Timer();
+    protected ArrayList<Pet> allpets = new ArrayList<>(0);
 
 	public Arena(){
 		System.out.printf("Arena Established\nWritten by B99902006 Po-Hsien\n\n");
 	}
     
 	private void init(){   
-        POOPet[] oldparr = getAllPets();
-        final Pet[] parr = new Pet[oldparr.length];
-        for (int i = 0; i < oldparr.length; i++)
-            parr[i] = (Pet)oldparr[i];
+        POOPet[] parr = getAllPets();
+        for (int i = 0; i < parr.length; i++)
+            allpets.add((Pet)parr[i]);
         
-        for (Pet pet : parr)
-            pet.initImage();
-		for (int i=0; i<parr.length; i++){
-            parr[i].initComp(window.Combat_Panel);
-            parr[i].initStatComp(window.getStatPanels(i+1));
+        for(int i=0; i<allpets.size(); i++){
+            allpets.get(i).initImage();
+            allpets.get(i).initComp(window.Combat_Panel);
+            allpets.get(i).initStatComp(window.getStatPanels(i+1));
         }
-       
+        
         show();
 		first_run = false;
         
         window.setVisible(true);
         window.addKeyListener(this);
+        
+        
+        String a = String.format("<h2>PET:%s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(0).getName(), "W", "D", "S", "A", "Q", "E", "F");
+        String b = String.format("<h2>PET:%s</h2><br/> UP: %s LEFT: %s DOWN: %s RIGHT: %s ATTACK: %s GUARD: %s JUMP: %s", allpets.get(1).getName(), "I", "L", "K", "J", "U", "O", "P");
+        String c = String.format("<html><h1>Control Settings</h1><br/> %s <br/> %s </html>", a, b);
+        JOptionPane.showMessageDialog(window, c, null, JOptionPane.INFORMATION_MESSAGE);
+        
         CLI_Timer.schedule(new TimerTask() {
             @Override
             public void run() {
-               for (POOPet pet : getAllPets())
+               for (Pet pet : allpets)
                    System.out.println(pet);
                 if(recentKey.size() > 0){
                     for (Integer integer : recentKey)
@@ -48,27 +53,33 @@ public class Arena extends POOArena implements KeyListener{
                 }
             }
         }, 0, 400);
+        
 	}
 
     @Override
 	public boolean fight(){
 		if (first_run == true)init();
 
-		for (POOPet e: getAllPets()){
+		for (Pet e: allpets){
 			if(e.getHP()>0){
 				POOAction act = e.act(this);
                 if(act != null && act.skill != null && act.dest != null) act.skill.act(act.dest);
 			}
             e.move(this);
 		}
-        int alive = 0;
-        for (POOPet e: getAllPets())
-            if(e.getHP()==0) alive++;
+        
+        for(int i=allpets.size()-1; i>=0; i--){
+            if(allpets.get(i).getHP() <= 0){
+                allpets.get(i).comp.dispose();
+                allpets.remove(i);
+            }
+        }
 
-        if(alive == 1){
+        if(allpets.size() == 1){
             window.dispose();
             CLI_Timer.cancel();
-            new AlertFrame("Pet survived!!!");
+            JOptionPane.showMessageDialog(window, String.format("<html><h1>%s</h1> Wins, Game over", allpets.get(0).getName()));
+            System.exit(0);
             return false;
         }
         else return true;
@@ -82,7 +93,7 @@ public class Arena extends POOArena implements KeyListener{
             System.out.println(ex);
         }
         
-        for (POOPet pOOPet : getAllPets()) {
+        for (Pet pOOPet : allpets) {
             Pet pet = (Pet)pOOPet;
             pet.draw(this);
         }
@@ -90,7 +101,7 @@ public class Arena extends POOArena implements KeyListener{
     
     @Override
 	public POOCoordinate getPosition(POOPet p){
-		return ((Pet)p).getComp().getCoor();
+		return ((Pet)p).comp.getCoor();
 	}
     protected HashSet<Integer> getKey(){
         return key;
@@ -100,19 +111,29 @@ public class Arena extends POOArena implements KeyListener{
         return recentKey.toArray(a);
     }
     public int searchPosition(POOCoordinate t){
-		POOPet[] parr = getAllPets();
-		for (int i=0; i<parr.length; i++)
-			if (t.equals(getPosition(parr[i]))) return i;
+		ArrayList<Pet> parr = allpets;
+		for (int i=0; i<parr.size(); i++)
+			if (t.equals(getPosition(parr.get(i)))) return i;
 		return -1;
 	}
-    
+    public ArrayList<Pet> getAllPetsExcept(ArrayList<POOPet> blocklist){
+        ArrayList<Pet> tmp = (ArrayList<Pet>) allpets.clone();
+        for(int i=tmp.size(); i>=0; i--)
+            if(blocklist.indexOf(tmp.get(i)) >= 0) tmp.remove(i);
+        return tmp;
+    }
+    public ArrayList<Pet> getAllPetsExcept(Pet pet){
+        ArrayList<Pet> tmp = (ArrayList<Pet>) allpets.clone();
+        tmp.remove(pet);
+        return tmp;
+    }
     public int searchBlockPosition(Rectangle t, ArrayList<Pet> blockList){
-        POOPet[] parr = getAllPets();
-        for (int i = 0; i < parr.length; i++) {
-            Pet pet = (Pet) parr[i];
+        ArrayList<Pet> parr = allpets;
+        for (int i = 0; i < parr.size(); i++) {
+            Pet pet = parr.get(i);
             
             if(blockList.indexOf(pet) >= 0) continue;
-            Rectangle tmp = new Rectangle(pet.comp.getCoor().x, pet.comp.getCoor().y, pet.comp.getComp().getSize().height, pet.comp.getComp().getSize().width);
+            Rectangle tmp = new Rectangle(pet.comp.getCoor().x, pet.comp.getCoor().y, pet.comp.getComp().getSize().width, pet.comp.getComp().getSize().height);
             for(int j=0; j<t.height; j++)
                 for(int k=0; k<t.width; k++)
                     if(POOUtil.isInside(tmp.x, t.x+j, tmp.x+tmp.height) && POOUtil.isInside(tmp.y, t.y+k, tmp.y+tmp.width)) 
@@ -120,6 +141,7 @@ public class Arena extends POOArena implements KeyListener{
         }
         return -1;
     }
+    
     @Override
     public void keyTyped(KeyEvent e) {
         
@@ -136,7 +158,6 @@ public class Arena extends POOArena implements KeyListener{
         System.out.println(", release " + e.getKeyCode() + " key");
         
         if(key.remove(e.getKeyCode())){
-            if(recentKey.indexOf(e.getKeyCode()) < 0)
                 recentKey.add(e.getKeyCode());
         }
     }
@@ -160,7 +181,7 @@ class MyComp{
         this.comp = comp;
         this.comp.setSize(new Dimension(width, height));
         this.coor = new Coordinate(x, y);
-        // this.comp.setBorder(new LineBorder(Color.yellow));
+        draw();
     }
     public void setLimit(Rectangle rec){
         limit = (Rectangle)(rec.clone());
@@ -184,7 +205,7 @@ class MyComp{
     }
     public void draw(){
         Insets insets = contain.getInsets();
-        comp.setBounds(coor.y+insets.left, coor.x+insets.top, this.comp.getSize().width, this.comp.getSize().height);
+        comp.setBounds(coor.y+insets.left, coor.x+insets.top, comp.getSize().width, comp.getSize().height);
     }
     public void dispose(){
         comp.setVisible(false);
@@ -196,5 +217,15 @@ class MyComp{
         s.x = s.y;
         s.y = tmp;
         return s;
+    }
+    
+    public POOCoordinate getCenter(){
+        Rectangle t = getBounds();
+        return new Coordinate(t.x + t.height/2, t.y + t.width/2);
+    }
+    public void setCenter(POOCoordinate t){
+        coor.x = t.x - getBounds().height/2;
+        coor.y = t.y - getBounds().width/2;
+        draw();
     }
 }

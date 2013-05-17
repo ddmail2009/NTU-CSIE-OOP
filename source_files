@@ -6,8 +6,9 @@ src/ntu/csie/oop13spring/ImagePanel.java
 src/ntu/csie/oop13spring/MainWindow.java
 src/ntu/csie/oop13spring/MoveState.java
 src/ntu/csie/oop13spring/Pet.java
-src/ntu/csie/oop13spring/Pet_Foe.java
-src/ntu/csie/oop13spring/Pet_Isaac.java
+src/ntu/csie/oop13spring/Pet_Magmortar.java
+src/ntu/csie/oop13spring/Pet_Electivire.java
 src/ntu/csie/oop13spring/POOConstant.java
 src/ntu/csie/oop13spring/POOUtil.java
 src/ntu/csie/oop13spring/Skills.java
+src/ntu/csie/oop13spring/Monster.java

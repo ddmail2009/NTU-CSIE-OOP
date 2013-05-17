@@ -49,5 +49,8 @@ public class POOUtil {
     public static boolean isInside(int low, int middle, int high){
         return (low<=middle && middle<high);
     }
+    public static int ABSLimit(int n, int limit){
+        return n>limit ? limit : (n < -limit ? -limit : n);
+    }
 }
 

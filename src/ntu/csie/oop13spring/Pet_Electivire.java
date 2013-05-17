@@ -7,27 +7,39 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.border.*;
 
-public class Pet_Isaac extends Pet{
+public class Pet_Electivire extends Pet{
     private BufferedImage []images;
-    private Integer []actionkeys = {KeyEvent.VK_W, KeyEvent.VK_D, KeyEvent.VK_S, KeyEvent.VK_A, KeyEvent.VK_G, KeyEvent.VK_H, KeyEvent.VK_J};
     
-    Count_Task mp_regeneration = new Count_Task(10) {
-        @Override
-        public int task() { 
-            return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
-        }
-    };
+    
+    Count_Task mp_regeneration;
      
-	public Pet_Isaac(){
+	public Pet_Electivire(){
         super();
-		init(100, 100, 3, "Isaac");
+        
+		init(100, 100, 3, "Electivire");
+        
+        actionkeys[0] = KeyEvent.VK_I;
+        actionkeys[1] = KeyEvent.VK_L;
+        actionkeys[2] = KeyEvent.VK_K;
+        actionkeys[3] = KeyEvent.VK_J;
+        actionkeys[4] = KeyEvent.VK_U;
+        actionkeys[5] = KeyEvent.VK_O;
+        actionkeys[6] = KeyEvent.VK_P;
+        
+        this.mp_regeneration = new Count_Task(30/getAGI()) {
+            @Override
+            public int task() { 
+                return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
+            }
+        };
 	}
+    
     
     @Override
     protected void initImage(){
         images = new BufferedImage[4];
         for(int i=0; i<images.length; i++){
-            String a = String.format("%sFoe%d.png", POOUtil.getCWD()+"images/", i);
+            String a = String.format("%sElectivire%d.png", POOUtil.getCWD()+"images/", i);
             images[i] = POOUtil.getImage(a);
         }
     }
@@ -58,8 +70,7 @@ public class Pet_Isaac extends Pet{
         };
         
         ArrayList<Integer> recent = new ArrayList<>();
-        for (int i=0; i<recentKey.length; i++)
-            recent.add(recentKey[i]);
+        recent.addAll(Arrays.asList(recentKey));
         for (int i=recent.size()-1; i>=0; i--){
             int match = 0;
             for (int j = 0; j < actionkeys.length; j++)
@@ -83,11 +94,6 @@ public class Pet_Isaac extends Pet{
             }
         }
         return null;
-    }
-    
-    @Override
-    public void setActionkeys(Integer []actionkeys){
-        System.arraycopy(actionkeys, 0, this.actionkeys, 0, this.actionkeys.length);
     }
     
     @Override
@@ -119,7 +125,7 @@ public class Pet_Isaac extends Pet{
         e.skill = getSkills(key);
         e.dest = null;
 
-        if( e.skill != null && ((Skills)e.skill).require(this) ){;
+        if( e.skill != null && ((Skills)e.skill).require(this) ){
             if(e.skill instanceof TimerSkills){
                  skilllist.add(((TimerSkills)e.skill));
                  ((TimerSkills)e.skill).startTimer(arena);
@@ -174,8 +180,8 @@ public class Pet_Isaac extends Pet{
 
     @Override
     protected void initComp(Container container) {
-        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height-50, container.getSize().width/4);
-        comp.setLimit(new Rectangle(container.getSize().height/2, 0, container.getSize().width, container.getSize().height));
+        comp = new MyComp(container, new JLabel(new ImageIcon(images[0])), container.getSize().height/4, container.getSize().width*3/4);
+        comp.setLimit(new Rectangle(0, 0, container.getSize().width, container.getSize().height));
     }
 
     @Override
@@ -183,7 +189,7 @@ public class Pet_Isaac extends Pet{
         int height = container.getSize().height;
         int width = container.getSize().width;
         
-        JLabel label = new JLabel(new ImageIcon(images[0]));
+        JLabel label = new JLabel(new ImageIcon(images[2]));
         
         JLabel hp = new JLabel("HP");
         hp.setHorizontalAlignment(SwingConstants.CENTER);
@@ -211,6 +217,12 @@ public class Pet_Isaac extends Pet{
         if(POOUtil.isInside(0, POOConstant.Direction_MAP.get(GetCurrentDirection()), 4)) 
             ((JLabel)comp.getComp()).setIcon(new ImageIcon(images[POOConstant.Direction_MAP.get(GetCurrentDirection())]));
         comp.draw();
+        
+        for (Map.Entry<String, Integer> ti : timer.entrySet()) {
+            String string = ti.getKey();
+            Integer integer = ti.getValue();
+            timer.put(string, integer+1);
+        }
         
         statcomp.get(2).getComp().setSize(getHP()*statcomp.get(0).getComp().getSize().width/100, statcomp.get(2).getComp().getSize().height);
         statcomp.get(3).getComp().setSize(getMP()*statcomp.get(1).getComp().getSize().width/100, statcomp.get(3).getComp().getSize().height);
