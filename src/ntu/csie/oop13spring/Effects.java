@@ -3,7 +3,7 @@ package ntu.csie.oop13spring;
 import java.awt.*;
 import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.border.*;
+import javax.swing.border.LineBorder;
 
 public abstract class Effects extends POOSkill{
     private String name, description;
@@ -231,7 +231,7 @@ class MissleAttack extends TimerEffects{
         }
         
         
-        if( counter == 80 || comp.size() == 0 ){
+        if( counter == 80 || comp.isEmpty() ){
             for (POOJComp myComp : comp) myComp.dispose();
             from.clearRegister("MissleAttack");
             return -1;

@@ -11,8 +11,8 @@ public class Monster extends Pet{
      
 	public Monster(){
         super();
-		init(100, 100, 1, "Monster");
-        this.mp_regeneration = new Count_Task(30/getAGI()) {
+		init(100, 100, 2, "Monster");
+        this.mp_regeneration = new Count_Task(60) {
             @Override
             public int task() { 
                 return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
@@ -83,11 +83,10 @@ public class Monster extends Pet{
         if(POOUtil.isStatus(State, POOConstant.STAT_LOCK)) return null;
         counter ++;
         POOCoordinate coor = comp.getCenter();
-        if(counter % 10 == 0){
+        if(counter % 8 == 0){
             ArrayList<POOPet> block = new ArrayList<>();
-            for (Pet pet : ((Arena)oldarena).allpets) {
+            for (Pet pet : ((Arena)oldarena).allpets)
                 if(pet.getName().equals("Monster")) block.add(pet);
-            }
             ArrayList<Pet> parr = ((Arena)oldarena).getAllPetsExcept(block);
             if(parr.size() == 0) return comp.getCoor();
             

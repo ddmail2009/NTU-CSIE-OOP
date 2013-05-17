@@ -10,7 +10,6 @@ import javax.swing.border.LineBorder;
 public class Pet_Electivire extends Pet{
     private BufferedImage []images;
     
-    
     Count_Task mp_regeneration;
      
 	public Pet_Electivire(){
@@ -26,7 +25,7 @@ public class Pet_Electivire extends Pet{
         actionkeys[5] = KeyEvent.VK_PERIOD;
         actionkeys[6] = KeyEvent.VK_SLASH;
         
-        this.mp_regeneration = new Count_Task(30/getAGI()) {
+        this.mp_regeneration = new Count_Task(30) {
             @Override
             public int task() { 
                 return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );

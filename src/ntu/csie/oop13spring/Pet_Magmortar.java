@@ -24,7 +24,7 @@ public class Pet_Magmortar extends Pet{
         actionkeys[4] = KeyEvent.VK_F;
         actionkeys[5] = KeyEvent.VK_G;
         actionkeys[6] = KeyEvent.VK_H;
-        this.mp_regeneration = new Count_Task(30/getAGI()) {
+        this.mp_regeneration = new Count_Task(30) {
             @Override
             public int task() { 
                 return (setMP(getMP()<100 ? getMP()+1 : 100) == true? 1 : 0 );
