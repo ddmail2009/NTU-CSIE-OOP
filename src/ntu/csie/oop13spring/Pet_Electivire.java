@@ -9,7 +9,7 @@ import javax.swing.border.LineBorder;
 
 public class Pet_Electivire extends Pet{
     private BufferedImage []images;
-    
+    private HashMap<Integer, Effects> KeyMap = new HashMap<>();
     Count_Task mp_regeneration;
      
 	public Pet_Electivire(){
