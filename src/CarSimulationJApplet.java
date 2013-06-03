@@ -85,6 +85,7 @@ public class CarSimulationJApplet extends JApplet {
         restart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                stopAndResume.setText("resume");
                 start = true;
                 highway.init(lane_num);
             }
