@@ -66,11 +66,11 @@ public class Lane{
         @return The distance ahead of the specific position
     */
     synchronized public int distance_ahead( int position ){
-        for( int i=0; i<cars.size(); i++ ){
-            if( cars.get(i).getPosition() > position )
-                return cars.get(i).getPosition() - position - 48;
+        for( int i=0; i<getLoads(); i++ ){
+            if( getCars(i).getPosition() > position )
+                return getCars(i).getPosition() - position - 48;
         }
-        return length;
+        return getLength();
     }
 
     /** Search whether or not there a car in the specific position
@@ -78,9 +78,9 @@ public class Lane{
         @return the car's index in the lane's list
     */
     synchronized public int position_search( int position ){
-        for( int i=0; i<cars.size(); i++ ){
-            if( cars.get(i).getPosition() == position )return i;
-            else if( cars.get(i).getPosition() > position )break;
+        for( int i=0; i<getLoads(); i++ ){
+            if( getCars(i).getPosition() == position )return i;
+            else if( getCars(i).getPosition() > position )break;
         }
         return -1;
     }
@@ -89,29 +89,26 @@ public class Lane{
         @return -1 if no crash happened
     */
     synchronized public int getCrashPosition(){
-        for( int i=0; i<cars.size(); i++ )
-            for( int j=i+1; j<cars.size(); j++ ){
-                if( cars.get(i).getPosition()+48 > cars.get(j).getPosition() ){
-                    return (cars.get(i).getPosition() + cars.get(j).getPosition())/2;
+        for( int i=0; i<getLoads(); i++ )
+            for( int j=i+1; j<getLoads(); j++ ){
+                if( getCars(i).getPosition()+48 > getCars(j).getPosition() ){
+                    System.err.println("===================Crashed===================\n");
+                    getCars(i).print();
+                    getCars(j).print();
+                    
+                    return (getCars(i).getPosition() + getCars(j).getPosition())/2;
                 }
             }
         return -1;
     }
     
-    
-    synchronized public void print(){
-        for (Cars car : cars) {
-            car.print();
-        }
-    }
-
     synchronized void checkCarLeave() {
-        for( int j=0; j<cars.size(); j++ )
-            if( cars.get(j).getPosition() > length )
-                car_leave(cars.get(j));
+        for( int j=0; j<getLoads(); j++ )
+            if( getCars(j).getPosition() > getLength() )
+                car_leave(getCars(j));
     }
 
-    public int getLength() {
+    synchronized public int getLength() {
         return length;
     }
 };

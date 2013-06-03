@@ -10,7 +10,8 @@ public class CarSimulationJApplet extends JApplet {
     private boolean start = true, end = false;
     private JLabel label;
     private boolean stop_add_car = false;
-    private JButton stop_button;
+    private JButton stopauto_button;
+    private JButton stopAndResume;
 
     private BufferedImage []carImage = new BufferedImage[4];
 
@@ -40,46 +41,55 @@ public class CarSimulationJApplet extends JApplet {
         });
         add(button);
         
-        JButton button2 = new JButton("ADD Cars@200");
+        JButton button2 = new JButton("ADD Cars@300");
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if( highway.car_join(new Cars(highway, carImage), 200, 0) == false)
+                if( highway.car_join(new Cars(highway, carImage), 300, 0) == false)
                     label.setText("Can't add, plz wait");   
                 else label.setText("add Success!!"); 
             }
         });
         add(button2);
-        
-        JButton button3 = new JButton("restart");
-        button3.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                highway.init(lane_num);
-                start = true;
-            }
-        });
-        add(button3);
-        
-        stop_button = new JButton("stopAutoAddCars");
-        stop_button.addActionListener(new ActionListener() {
+                
+        stopauto_button = new JButton("stopAutoAddCars");
+        stopauto_button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 stop_add_car = !stop_add_car;
-                if(stop_button.getText().equals("stopAutoAddCars"))stop_button.setText("startAutoAddCars");
-                else stop_button.setText("stopAutoAddCars");
+                if(stopauto_button.getText().equals("stopAutoAddCars"))stopauto_button.setText("startAutoAddCars");
+                else stopauto_button.setText("stopAutoAddCars");
             }
         });
-        add(stop_button);
+        add(stopauto_button);
         
-        JButton stop = new JButton("stop");
-        stop.addActionListener(new ActionListener() {
+        stopAndResume = new JButton("stop");
+        stopAndResume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                start = false;
+                if(stopAndResume.getText().equals("stop")){
+                    start = false;
+                    highway.pause();
+                    stopAndResume.setText("resume");
+                }
+                else{
+                    start = true;
+                    highway.resume();
+                    stopAndResume.setText("stop");
+                }
             }
         });
-        add(stop);
+        add(stopAndResume);
+        
+        JButton restart = new JButton("restart");
+        restart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                start = true;
+                highway.init(lane_num);
+            }
+        });
+        add(restart);
         
         label = new JLabel();
         add(label);
@@ -87,14 +97,10 @@ public class CarSimulationJApplet extends JApplet {
         getContentPane().repaint();
         
     }
-   
-    public static void main(String[] args){
-    }
     
     @Override
     public void start(){
         System.err.println("start");
-        
         while(end == false){
             int count = 0;
             while(start){
@@ -103,12 +109,12 @@ public class CarSimulationJApplet extends JApplet {
                 } catch (InterruptedException ex) {}
                 count = (count + 1)%1000;
 
-                if(stop_add_car == false && count % 5 == 0){
-                    if(Math.random()*10 < 1)
+                if(stop_add_car == false){
+                    if(count%1 == 0 && Math.random()*100 < 5)
                         highway.car_join(new Cars(highway, carImage), 0, 0);
-                    if(Math.random()*10 < 3)
+                    if(count%2 == 0 && Math.random()*10 < 1)
                         highway.car_join(new Cars(highway, carImage), 0, 1);
-                    if(Math.random()*10 < 6)
+                    if(count%3 == 0 && Math.random()*10 < 7)
                         highway.car_join(new Cars(highway, carImage), 0, 2);
                 }
 
@@ -116,16 +122,10 @@ public class CarSimulationJApplet extends JApplet {
                     start = false;
                 repaint();
             }
-//            if(start == false && count != 0)
-//                highway.init(lane_num);
+            stopAndResume.setText("resume");
         }
         
     }
-    
-    public void stop(){
-        System.err.println("ASD");
-        end = true;
-    }
-   
+
     // TODO overwrite start(), stop() and destroy() methods
 }

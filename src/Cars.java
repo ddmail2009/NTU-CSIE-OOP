@@ -19,9 +19,11 @@ public class Cars implements Runnable{
     
     public int []lane_id = new int[2];
     protected boolean stop = false;
+    protected boolean end = false;
     private double accerleration;
 
     private BufferedImage []img;
+    
 
 	/** Given the ID, and initial the count_down number*/
 	public Cars(Highway highway, BufferedImage img[]){
@@ -66,12 +68,12 @@ public class Cars implements Runnable{
 		int tmp = decide(distance);
 
         if( tmp > speed+accerleration ) accerleration += 0.08;
-        else if( tmp < speed+accerleration )accerleration -= (speed - tmp);
+        else if( tmp < speed+accerleration )accerleration -= (speed - tmp)/2;
 	}
 
 	/** Print the current state of this Car */
 	public void print(){
-		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", id, lane_id[0], getPosition(), speed, accerleration);
+		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", getID(), lane_id[0], getPosition(), speed, accerleration);
 	}
 
 	/** Move the car based on the current speed, update its mileage and position 
@@ -94,22 +96,26 @@ public class Cars implements Runnable{
     
     @Override
     public void run() {
-        while(stop == false){
+        System.err.printf("Cars[%d] add\n", getID());
+        while(end == false){
+            while(stop == false && end == false){
+                try {
+                    Thread.sleep(32);
+                } catch (InterruptedException ex) { }
+
+                if(getPosition() > highway.getLane(lane_id[0]).getLength()){
+                    end = true;
+                }
+                else{
+                    decision();
+                    drive();
+                }
+            }
             try {
                 Thread.sleep(32);
             } catch (InterruptedException ex) { }
-            
-            if(getPosition() > highway.getLane(lane_id[0]).getLength()){
-                break;
-            }
-            else{
-                decision();
-                drive();
-            }
-            if(speed > 0 && accerleration < 0)print();
         }
-        System.err.printf("Cars[%d] stop\n", getID());
-
+        System.err.printf("Cars[%d] leave\n", getID());
     }
 
     Image show() {
