@@ -35,7 +35,7 @@ public class Lane{
             for(int i=0; i<48; i++)
                 if(position_search(position+i) != -1)return false;
             cars.add(car);
-            car.position = position;
+            car.setPosition(position);
             car.setSpeed(car.decide(distance_ahead(position)));
             position_sort();
             return true;
@@ -56,7 +56,7 @@ public class Lane{
         Collections.sort(cars, new Comparator<Cars>() {
             @Override
             public int compare(Cars o1, Cars o2) {
-                return o1.position - o2.position;
+                return o1.getPosition() - o2.getPosition();
             }
         });
     }
@@ -67,8 +67,8 @@ public class Lane{
     */
     synchronized public int distance_ahead( int position ){
         for( int i=0; i<cars.size(); i++ ){
-            if( cars.get(i).position > position )
-                return cars.get(i).position - position - 48;
+            if( cars.get(i).getPosition() > position )
+                return cars.get(i).getPosition() - position - 48;
         }
         return length;
     }
@@ -79,8 +79,8 @@ public class Lane{
     */
     synchronized public int position_search( int position ){
         for( int i=0; i<cars.size(); i++ ){
-            if( cars.get(i).position == position )return i;
-            else if( cars.get(i).position > position )break;
+            if( cars.get(i).getPosition() == position )return i;
+            else if( cars.get(i).getPosition() > position )break;
         }
         return -1;
     }
@@ -91,8 +91,8 @@ public class Lane{
     synchronized public int getCrashPosition(){
         for( int i=0; i<cars.size(); i++ )
             for( int j=i+1; j<cars.size(); j++ ){
-                if( cars.get(i).position+48 > cars.get(j).position ){
-                    return (cars.get(i).position + cars.get(j).position)/2;
+                if( cars.get(i).getPosition()+48 > cars.get(j).getPosition() ){
+                    return (cars.get(i).getPosition() + cars.get(j).getPosition())/2;
                 }
             }
         return -1;
@@ -107,7 +107,7 @@ public class Lane{
 
     synchronized void checkCarLeave() {
         for( int j=0; j<cars.size(); j++ )
-            if( cars.get(j).position > length )
+            if( cars.get(j).getPosition() > length )
                 car_leave(cars.get(j));
     }
 

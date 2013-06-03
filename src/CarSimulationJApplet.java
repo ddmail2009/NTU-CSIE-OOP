@@ -23,8 +23,6 @@ public class CarSimulationJApplet extends JApplet {
         for(int i=0; i<4; i++)
             carImage[i] = MyUtil.getImage(String.format("img/car%d.png", i));
         
-        
-        
         setLayout(new FlowLayout());
         highway = new Highway(getWidth()-48, 20, lane_num);
         
@@ -105,13 +103,13 @@ public class CarSimulationJApplet extends JApplet {
                 } catch (InterruptedException ex) {}
                 count = (count + 1)%1000;
 
-                if(stop_add_car == false){
-                    if(count % 20 == 0)
+                if(stop_add_car == false && count % 5 == 0){
+                    if(Math.random()*10 < 1)
                         highway.car_join(new Cars(highway, carImage), 0, 0);
-                    if(count % 12 == 0)
-                        highway.car_join(new Cars(highway, carImage), 0, 2);
-                    else if(count % 5 == 0)
+                    if(Math.random()*10 < 3)
                         highway.car_join(new Cars(highway, carImage), 0, 1);
+                    if(Math.random()*10 < 6)
+                        highway.car_join(new Cars(highway, carImage), 0, 2);
                 }
 
                 if( highway.check() == false )

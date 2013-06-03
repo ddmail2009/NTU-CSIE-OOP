@@ -11,14 +11,13 @@ public class Cars implements Runnable{
 	/** This Car's ID based on when it was created */
 	private int id;
 	/** The Current position of the car*/
-	public int position;
-    
-    public final static int max_speed = 10;
+	private int position;
     private Highway highway;
     
+    public final static int max_speed = 10;
 	public int begin = 0;
     
-    public int lane_id;
+    public int []lane_id = new int[2];
     protected boolean stop = false;
     private double accerleration;
 
@@ -61,9 +60,9 @@ public class Cars implements Runnable{
 	*/	
 	public void decision(){
         int lane = highway.getProsperLane(this);
-        if(lane != lane_id) highway.changeLane(this, lane);
+        if(lane != lane_id[0]) highway.changeLane(this, lane);
         
-        int distance = highway.getLane(lane_id).distance_ahead(position);
+        int distance = highway.getLane(lane_id[0]).distance_ahead(getPosition());
 		int tmp = decide(distance);
 
         if( tmp > speed+accerleration ) accerleration += 0.08;
@@ -72,7 +71,7 @@ public class Cars implements Runnable{
 
 	/** Print the current state of this Car */
 	public void print(){
-		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", id, lane_id, position, speed, accerleration);
+		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", id, lane_id[0], getPosition(), speed, accerleration);
 	}
 
 	/** Move the car based on the current speed, update its mileage and position 
@@ -88,7 +87,7 @@ public class Cars implements Runnable{
             speed = max_speed;
         }
         
-        position += speed;
+        setPosition(getPosition() + speed);
         begin += 1;
         return speed;
     }
@@ -100,14 +99,14 @@ public class Cars implements Runnable{
                 Thread.sleep(32);
             } catch (InterruptedException ex) { }
             
-            if(position > highway.getLane(lane_id).getLength()){
+            if(getPosition() > highway.getLane(lane_id[0]).getLength()){
                 break;
             }
             else{
                 decision();
                 drive();
             }
-            if(lane_id == 2 && speed > 0 && accerleration < 0)print();
+            if(speed > 0 && accerleration < 0)print();
         }
         System.err.printf("Cars[%d] stop\n", getID());
 
@@ -119,5 +118,19 @@ public class Cars implements Runnable{
 
     void setSpeed(int decide) {
         speed = decide;
+    }
+
+    /**
+     * @return the position
+     */
+    public int getPosition() {
+        return position;
+    }
+
+    /**
+     * @param position the position to set
+     */
+    public void setPosition(int position) {
+        this.position = position;
     }
 }
