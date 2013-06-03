@@ -25,7 +25,7 @@ public class CarSimulationJApplet extends JApplet {
             carImage[i] = MyUtil.getImage(String.format("img/car%d.png", i));
         
         setLayout(new FlowLayout());
-        highway = new Highway(getWidth()-48, 20, lane_num);
+        highway = new Highway(getWidth(), 20, lane_num);
         
         highway.setPreferredSize(new Dimension(800, 120*3+20));
         add(highway);
