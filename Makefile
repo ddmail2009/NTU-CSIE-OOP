@@ -1,7 +1,7 @@
 .PHONY: compile run
 
 all:
-	make compile 
+	make compile
 	make run
 
 compile:
@@ -10,4 +10,4 @@ compile:
 
 run:
 	echo "<applet code='CarSimulationJApplet.class' archive='hw5.jar' width='800' height='600'></applet>" > index.html
-	appletviewer test.html
+	appletviewer index.html
