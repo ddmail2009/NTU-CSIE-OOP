@@ -1,6 +1,6 @@
 
-import java.awt.*;
-import java.awt.image.BufferedImage;
+import java.awt.Image;
+import java.awt.image.*;
 
 /** Class Description of Cars */
 public class Cars implements Runnable{
@@ -13,23 +13,26 @@ public class Cars implements Runnable{
 	/** The Current position of the car*/
 	public int position;
     
-    private static int max_speed = 10;
+    public final static int max_speed = 10;
     private Highway highway;
     
 	public int begin = 0;
     
     public int lane_id;
-    private BufferedImage img = null;
     protected boolean stop = false;
-    private int accerleration;
+    private double accerleration;
+
+    private BufferedImage []img;
 
 	/** Given the ID, and initial the count_down number*/
-	public Cars(Highway highway, BufferedImage img){
+	public Cars(Highway highway, BufferedImage img[]){
 		this.id = total_car_num++;
         this.highway = highway;
+
         this.img = img;
 		speed = 0;
         accerleration = 0;
+        begin = 0;
 	}
 
 	/** Return the Car's current speed
@@ -49,8 +52,8 @@ public class Cars implements Runnable{
 	/** Find the max(distance/2, 4)
 		@param distance the distance ahead of car
 		@return the expect speed pursuant to the distance*/
-	public static int decide( int distance ){
-		return distance/2 > max_speed ? max_speed : distance/2;
+	public int decide( int distance ){
+		return (distance-accerleration)/2 > max_speed ? max_speed : (int)(distance-accerleration)/2;
 	}
 
 	/** Decide its decision based on the distance ahead
@@ -63,17 +66,13 @@ public class Cars implements Runnable{
         int distance = highway.getLane(lane_id).distance_ahead(position);
 		int tmp = decide(distance);
 
-		// If the car was just car_joined the highway, speed up immediately
-//		if( begin == true && tmp >= 1 ) accerleration += tmp;
-        if( tmp > speed )accerleration += 2;
-        else if( tmp < speed )accerleration -= 1;
-        
-        if(speed + accerleration > tmp) accerleration = tmp - speed;
+        if( tmp > speed+accerleration ) accerleration += 0.08;
+        else if( tmp < speed+accerleration )accerleration -= (speed - tmp);
 	}
 
 	/** Print the current state of this Car */
 	public void print(){
-		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5d\n", id, lane_id, position, speed, accerleration);
+		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", id, lane_id, position, speed, accerleration);
 	}
 
 	/** Move the car based on the current speed, update its mileage and position 
@@ -81,18 +80,14 @@ public class Cars implements Runnable{
 	*/
     public int drive() {
         speed += accerleration;
-        if(speed > max_speed){
-            speed = max_speed;
-            accerleration -= 1;
-        }
-        else if(speed < 0){
+        if(speed < 0){
             speed = 0;
-        }
-        
-        if(Math.random()*10 < 1){
-            speed /= 2;
             accerleration = 0;
         }
+        else if(speed > max_speed){
+            speed = max_speed;
+        }
+        
         position += speed;
         begin += 1;
         return speed;
@@ -112,13 +107,17 @@ public class Cars implements Runnable{
                 decision();
                 drive();
             }
-            print();
+            if(lane_id == 2 && speed > 0 && accerleration < 0)print();
         }
         System.err.printf("Cars[%d] stop\n", getID());
 
     }
 
     Image show() {
-        return img;
+        return img[speed*3/max_speed];
+    }
+
+    void setSpeed(int decide) {
+        speed = decide;
     }
 }

@@ -1,7 +1,7 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.image.BufferedImage;
+import java.awt.image.*;
 import javax.swing.*;
 
 public class CarSimulationJApplet extends JApplet {
@@ -9,14 +9,24 @@ public class CarSimulationJApplet extends JApplet {
     private int lane_num = 3;
     private boolean start = true, end = false;
     private JLabel label;
-    
+    private boolean stop_add_car = false;
+    private JButton stop_button;
+
+    private BufferedImage []carImage = new BufferedImage[4];
+
     @Override
     public void init() {
-        String choice = JOptionPane.showInputDialog(this, "Lane Number", "3");
+        String []option = {"1", "2", "3"};
+        String choice = (String) JOptionPane.showInputDialog(this, "Choose Lane Number", "CarSimulation", JOptionPane.PLAIN_MESSAGE, null, option, "3");
         lane_num = Integer.parseInt(choice);
+
+        for(int i=0; i<4; i++)
+            carImage[i] = MyUtil.getImage(String.format("img/car%d.png", i));
+        
+        
         
         setLayout(new FlowLayout());
-        highway = new Highway(800, 20, lane_num, getCodeBase());
+        highway = new Highway(getWidth()-48, 20, lane_num);
         
         highway.setPreferredSize(new Dimension(800, 120*3+20));
         add(highway);
@@ -25,7 +35,7 @@ public class CarSimulationJApplet extends JApplet {
         button.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if( highway.car_join(new Cars(highway, MyUtil.getImage(getCodeBase(), "img/car.png")), 1) == false )
+                if( highway.car_join(new Cars(highway, carImage), 1, 0) == false )
                     label.setText("Can't add, plz wait");
                 else label.setText("add Success!!");
             }
@@ -36,7 +46,7 @@ public class CarSimulationJApplet extends JApplet {
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if( highway.car_join(new Cars(highway, MyUtil.getImage(getCodeBase(), "img/car2.png")), 200) == false)
+                if( highway.car_join(new Cars(highway, carImage), 200, 0) == false)
                     label.setText("Can't add, plz wait");   
                 else label.setText("add Success!!"); 
             }
@@ -53,6 +63,26 @@ public class CarSimulationJApplet extends JApplet {
         });
         add(button3);
         
+        stop_button = new JButton("stopAutoAddCars");
+        stop_button.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                stop_add_car = !stop_add_car;
+                if(stop_button.getText().equals("stopAutoAddCars"))stop_button.setText("startAutoAddCars");
+                else stop_button.setText("stopAutoAddCars");
+            }
+        });
+        add(stop_button);
+        
+        JButton stop = new JButton("stop");
+        stop.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                start = false;
+            }
+        });
+        add(stop);
+        
         label = new JLabel();
         add(label);
         this.setVisible(true);
@@ -67,10 +97,6 @@ public class CarSimulationJApplet extends JApplet {
     public void start(){
         System.err.println("start");
         
-        BufferedImage []img = new BufferedImage[2];
-        img[0] = MyUtil.getImage(getCodeBase(), "img/car.png");
-        img[1] = MyUtil.getImage(getCodeBase(), "img/car2.png");
-        
         while(end == false){
             int count = 0;
             while(start){
@@ -79,8 +105,14 @@ public class CarSimulationJApplet extends JApplet {
                 } catch (InterruptedException ex) {}
                 count = (count + 1)%1000;
 
-                if(count %10 == 0)highway.car_join(new Cars(highway, img[0]), 1);
-//                highway.car_join(new Cars(highway, img[1]), 200);
+                if(stop_add_car == false){
+                    if(count % 20 == 0)
+                        highway.car_join(new Cars(highway, carImage), 0, 0);
+                    if(count % 12 == 0)
+                        highway.car_join(new Cars(highway, carImage), 0, 2);
+                    else if(count % 5 == 0)
+                        highway.car_join(new Cars(highway, carImage), 0, 1);
+                }
 
                 if( highway.check() == false )
                     start = false;

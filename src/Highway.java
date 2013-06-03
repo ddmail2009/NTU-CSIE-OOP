@@ -11,7 +11,6 @@ public class Highway extends JPanel{
     
     private BufferedImage img;
     private BufferedImage car;
-    private URL codebase;
     public Object drive_lock = new Object(), decide_lock = new Object();
     public int ready_car = 0;
     private int crash_lane = -1;
@@ -31,7 +30,7 @@ public class Highway extends JPanel{
         if(crash_lane != -1){
             int crash_position = lane[crash_lane].getCrashPosition();
             System.err.printf("crash_position = %d\n", crash_position);
-            g.drawImage(MyUtil.getImage(codebase, "img/boom.png"), crash_position-1-24, 120*crash_lane+50, 96, 78, this);
+            g.drawImage(MyUtil.getImage("img/boom.png"), crash_position-1-24, 120*crash_lane+50, 96, 78, this);
             
         }
     }
@@ -40,9 +39,7 @@ public class Highway extends JPanel{
 		@param length road_length
 		@param max_cars total number of cars expected
 	*/
-	public Highway( int length, int max_cars, int num_lane, URL codebase){
-        this.codebase = codebase;
- 
+	public Highway( int length, int max_cars, int num_lane){
         this.length = length;
 		lane = new Lane[num_lane];  
 		for( int i=0; i<num_lane; i++ )
@@ -63,10 +60,10 @@ public class Highway extends JPanel{
         crash_lane = -1;
         
         BufferedImage []tmp = new BufferedImage[4];
-        tmp[0] = MyUtil.getImage(codebase, "img/other.png");
-        tmp[1] = MyUtil.getImage(codebase, "img/lane.png");
-        tmp[2] = MyUtil.getImage(codebase, "img/seperator.png");
-        car = MyUtil.getImage(codebase, "img/car.png");
+        tmp[0] = MyUtil.getImage("img/other.png");
+        tmp[1] = MyUtil.getImage("img/lane.png");
+        tmp[2] = MyUtil.getImage("img/seperator.png");
+        car = MyUtil.getImage("img/car.png");
         
         img = new BufferedImage(800, 600, BufferedImage.TYPE_INT_ARGB);
         Graphics g = img.getGraphics();
@@ -87,20 +84,21 @@ public class Highway extends JPanel{
         return lane.length;
     }
     
-    public boolean changeLane(Cars car, int lane_id){
-        if(car.begin > 10 || lane[lane_id].car_join(car, car.position) == false) return false;
+    synchronized public boolean changeLane(Cars car, int lane_id){
+        if(car.begin < 20 || car.getSpeed() < Cars.max_speed || lane[lane_id].car_join(car, car.position) == false) return false;
+        car.begin = 0;
         lane[car.lane_id].car_leave(car);
         car.lane_id = lane_id;
         return true;
     }
     
     synchronized int getProsperLane(Cars car){
-        int left     = Cars.decide( car.lane_id>0               ? getLane(car.lane_id-1).distance_ahead(car.position) : 0 );
-        int right    = Cars.decide( car.lane_id+1<getLaneNum()  ? getLane(car.lane_id+1).distance_ahead(car.position) : 0 );
-        int current  = Cars.decide(                               getLane(car.lane_id).distance_ahead(car.position) );
+        int left     = car.decide( car.lane_id>0               ? getLane(car.lane_id-1).distance_ahead(car.position) : 0 );
+        int right    = car.decide( car.lane_id+1<getLaneNum()  ? getLane(car.lane_id+1).distance_ahead(car.position) : 0 );
+        int current  = car.decide(                               getLane(car.lane_id).distance_ahead(car.position) );
 
-        if( left > right && left > current ) return car.lane_id-1;
-        else if( right > left && right >= current ) return car.lane_id + 1;
+        if( right >= left && right >= current ) return car.lane_id + 1;
+        else if( left > right && left > current ) return car.lane_id-1;
         else return car.lane_id;
     }
 
@@ -122,10 +120,11 @@ public class Highway extends JPanel{
 		@param position The entering point of the car
 		@return false if the position on the highway have another car or the car's start speed less than 1
 	*/
-	public boolean car_join( Cars car, int position ){
-		boolean joined = lane[0].car_join(car, position);
+	public boolean car_join( Cars car, int position, int lane_id ){
+        if(lane_id < 0 || lane_id >= lane.length ) return false;
+		boolean joined = lane[lane_id].car_join(car, position);
         if(joined){
-            car.lane_id = 0;
+            car.lane_id = lane_id;
             new Thread(car).start();
         }
         return joined;
