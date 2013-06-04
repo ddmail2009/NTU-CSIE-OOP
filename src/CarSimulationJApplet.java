@@ -7,11 +7,14 @@ import javax.swing.*;
 public class CarSimulationJApplet extends JApplet {
     private Highway highway = null;
     private int lane_num = 3;
-    private boolean start = true, end = false;
-    private JLabel label;
     private boolean stop_add_car = false;
-    private JButton stopauto_button;
-    private JButton stopAndResume;
+    
+    private boolean crashed = false;
+    
+    private JLabel label;
+    private JButton stopauto_button, stopAndResume;
+    
+    Timer CarApp;
 
     private BufferedImage []carImage = new BufferedImage[4];
 
@@ -67,16 +70,8 @@ public class CarSimulationJApplet extends JApplet {
         stopAndResume.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(stopAndResume.getText().equals("stop")){
-                    start = false;
-                    highway.pause();
-                    stopAndResume.setText("resume");
-                }
-                else{
-                    start = true;
-                    highway.resume();
-                    stopAndResume.setText("stop");
-                }
+                if(stopAndResume.getText().equals("stop")) stop();
+                else start();
             }
         });
         add(stopAndResume);
@@ -85,48 +80,55 @@ public class CarSimulationJApplet extends JApplet {
         restart.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                stopAndResume.setText("resume");
-                start = true;
+                crashed = false;
                 highway.init(lane_num);
+                start();
             }
         });
         add(restart);
         
-        label = new JLabel();
+        label = new JLabel("CarSimulationJApplet");
         add(label);
         this.setVisible(true);
-        getContentPane().repaint();
         
+        CarApp = new Timer(16, new ActionListener() {
+            int count = 0;
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(crashed == true)return;
+                
+                count = count + 1;
+                if(stop_add_car == false){
+                    if(count%3 == 0 && Math.random()*100 < 3)
+                        highway.car_join(new Cars(highway, carImage), 0, 0);
+                    if(count%2 == 0 && Math.random()*100 < 5)
+                        highway.car_join(new Cars(highway, carImage), 0, 1);
+                    if(count%1 == 0 && Math.random()*100 < 10)
+                        highway.car_join(new Cars(highway, carImage), 0, 2);
+                }
+
+                if( highway.check() == false ) crashed = true;
+                repaint();
+            }
+        });
     }
     
     @Override
     public void start(){
         System.err.println("start");
-        while(end == false){
-            int count = 0;
-            while(start){
-                try {
-                    Thread.sleep(64);
-                } catch (InterruptedException ex) {}
-                count = (count + 1)%1000;
-
-                if(stop_add_car == false){
-                    if(count%1 == 0 && Math.random()*100 < 5)
-                        highway.car_join(new Cars(highway, carImage), 0, 0);
-                    if(count%2 == 0 && Math.random()*10 < 1)
-                        highway.car_join(new Cars(highway, carImage), 0, 1);
-                    if(count%3 == 0 && Math.random()*10 < 7)
-                        highway.car_join(new Cars(highway, carImage), 0, 2);
-                }
-
-                if( highway.check() == false )
-                    start = false;
-                repaint();
-            }
-            stopAndResume.setText("resume");
-        }
-        
+        stopAndResume.setText("stop");
+        highway.resume();
+        CarApp.start();
     }
+    
+    @Override
+    public void stop(){
+        System.err.println("stop");
+        stopAndResume.setText("resume");
+        highway.pause();
+        CarApp.stop();
+    }
+    
 
     // TODO overwrite start(), stop() and destroy() methods
 }

@@ -10,6 +10,8 @@ public class Highway extends JPanel{
     
     private BufferedImage img;
     private int crash_lane = -1;
+    private int crash_position = -1;
+    private int changeLaneDuration = 20;
 
     @Override
     synchronized public void paintComponent(Graphics g){
@@ -19,10 +21,10 @@ public class Highway extends JPanel{
                 int index = getLane(i).position_search(j);
                 if( index >= 0 ){
                     Cars car = getLane(i).getCars(index);
-					if(car.begin > 20)
+					if(car.begin > changeLaneDuration)
                         g.drawImage(car.show(), (j-1)  , 120*i+50, 48, 39, this);
                     else{
-                        int position = (int) (120*(car.lane_id[0]*car.begin*1.0/20 + car.lane_id[1]*(1-car.begin*1.0/20))) + 50;
+                        int position = (int) (120*(car.lane_id[0]*car.begin*1.0/changeLaneDuration + car.lane_id[1]*(1-car.begin*1.0/changeLaneDuration))) + 50;
                         g.drawImage(car.show(), (j-1), position, 48, 39, this);
                     }
                 }
@@ -30,7 +32,6 @@ public class Highway extends JPanel{
 		}
         
         if(crash_lane != -1){
-            int crash_position = getLane(crash_lane).getCrashPosition();
             System.err.printf("crash_lane = %d, crash_position = %d\n", crash_lane, crash_position);
             if(crash_position != -1)
                 g.drawImage(MyUtil.getImage("img/boom.png"), crash_position-1-24, 120*crash_lane+50, 96, 78, this);
@@ -102,17 +103,21 @@ public class Highway extends JPanel{
     }
     
     synchronized public boolean changeLane(Cars car, int lane_id){
-        if(lane_id >= getLaneNum()) return false;
+        if(lane_id >= getLaneNum() || lane_id < 0) return false;
         
-        if(car.begin < 20 || car.getSpeed() < Cars.max_speed) return false;
+        int origin_lane = car.lane_id[0];
+        if(car.begin < changeLaneDuration || car.getSpeed() < car.getMax_speed()) return false;
+        if(car.getAccerleration() < 0) return false;
         if(getLane(lane_id).car_join(car, car.getPosition()) == false) return false;
         if(getLane(car.lane_id[0]).car_leave(car) == false){
             getLane(lane_id).car_leave(car);
             return false;
         }
+        
         car.begin = 0;
-        car.lane_id[1] = car.lane_id[0];
-        car.lane_id[0] = lane_id;       
+        car.lane_id[1] = origin_lane;   
+        car.lane_id[0] = lane_id;
+        car.setMax_speed();
         return true;
     }
     
@@ -122,7 +127,7 @@ public class Highway extends JPanel{
         int current  = car.decide(                                  getLane(car.lane_id[0]).distance_ahead(car.getPosition()) );
 
         if( right > left && right > current ) return car.lane_id[0] + 1;
-        else if(right > left && right == current && Math.random()>0.1) return car.lane_id[0] + 1;
+        else if(right >= left && right == current && Math.random()<0.1) return car.lane_id[0] + 1;
         else if( left > right && left > current ) return car.lane_id[0]-1;
         else return car.lane_id[0];
     }
@@ -150,10 +155,12 @@ public class Highway extends JPanel{
 	*/
 	public boolean car_join( Cars car, int position, int lane_id ){
         if(lane_id < 0 || lane_id >= getLaneNum() ) return false;
+        
 		boolean joined = getLane(lane_id).car_join(car, position);
         if(joined){
             car.lane_id[0] = lane_id;
             car.lane_id[1] = lane_id;
+            car.setMax_speed();
             new Thread(car).start();
         }
         return joined;
@@ -173,7 +180,8 @@ public class Highway extends JPanel{
 	synchronized private int IsPeace(){
 		for( int i=0; i<getLaneNum(); i++ ){
 			if( getLane(i).getCrashPosition() != -1){
-				System.err.printf("crashPosition = %d on lane[%2d]\n", getLane(i).getCrashPosition(),  i);
+                crash_position = getLane(i).getCrashPosition();
+				System.err.printf("crashPosition = %d on lane[%2d]\n", crash_position,  i);
 				return i;
 			}
 		}

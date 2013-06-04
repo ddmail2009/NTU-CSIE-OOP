@@ -14,7 +14,7 @@ public class Cars implements Runnable{
 	private int position;
     private Highway highway;
     
-    public final static int max_speed = 10;
+    private int max_speed = 10;
 	public int begin = 0;
     
     public int []lane_id = new int[2];
@@ -24,7 +24,6 @@ public class Cars implements Runnable{
 
     private BufferedImage []img;
     
-
 	/** Given the ID, and initial the count_down number*/
 	public Cars(Highway highway, BufferedImage img[]){
 		this.id = total_car_num++;
@@ -54,7 +53,7 @@ public class Cars implements Runnable{
 		@param distance the distance ahead of car
 		@return the expect speed pursuant to the distance*/
 	public int decide( int distance ){
-		return (distance-accerleration)/2 > max_speed ? max_speed : (int)(distance-accerleration)/2;
+		return (distance-getAccerleration())/2 > getMax_speed() ? getMax_speed() : (int)(distance-getAccerleration())/2;
 	}
 
 	/** Decide its decision based on the distance ahead
@@ -67,26 +66,26 @@ public class Cars implements Runnable{
         int distance = highway.getLane(lane_id[0]).distance_ahead(getPosition());
 		int tmp = decide(distance);
 
-        if( tmp > speed+accerleration ) accerleration += 0.08;
-        else if( tmp < speed+accerleration )accerleration -= (speed - tmp)/2;
+        if( tmp > speed+getAccerleration() ) accerleration += 0.2;
+        else if( tmp < speed+getAccerleration() )accerleration -= (speed - tmp);
 	}
 
 	/** Print the current state of this Car */
 	public void print(){
-		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", getID(), lane_id[0], getPosition(), speed, accerleration);
+		System.err.printf("Cars[%2d]@lane[%d]@%3d speed: %2d, accerleration: %5.2f\n", getID(), lane_id[0], getPosition(), speed, getAccerleration());
 	}
 
 	/** Move the car based on the current speed, update its mileage and position 
 		@return the distance between two time stamp
 	*/
     public int drive() {
-        speed += accerleration;
+        speed += getAccerleration();
         if(speed < 0){
             speed = 0;
             accerleration = 0;
         }
-        else if(speed > max_speed){
-            speed = max_speed;
+        else if(speed > getMax_speed()){
+            speed = getMax_speed();
         }
         
         setPosition(getPosition() + speed);
@@ -119,7 +118,7 @@ public class Cars implements Runnable{
     }
 
     Image show() {
-        return img[speed*3/max_speed];
+        return img[speed*3/getMax_speed()];
     }
 
     void setSpeed(int decide) {
@@ -138,5 +137,26 @@ public class Cars implements Runnable{
      */
     public void setPosition(int position) {
         this.position = position;
+    }
+
+    /**
+     * @return the max_speed
+     */
+    public int getMax_speed() {
+        return max_speed;
+    }
+
+    /**
+     * @param max_speed the max_speed to set
+     */
+    public void setMax_speed() {
+        max_speed = 8+2*lane_id[0];
+    }
+
+    /**
+     * @return the accerleration
+     */
+    public double getAccerleration() {
+        return accerleration;
     }
 }

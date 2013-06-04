@@ -28,15 +28,15 @@ public class Lane{
         @param position The Entering position
         @return false when the car can't join in
     */
-    synchronized public boolean car_join( Cars car, int position ){
+    synchronized public boolean car_join( Cars car, int position ){    
         if( car.decide(distance_ahead(position)) > 0 ){
             for(int i=0; i<car.getSpeed()*2+48; i++)
                 if(position_search(position-i) != -1)return false;
             for(int i=0; i<48; i++)
                 if(position_search(position+i) != -1)return false;
+            
             cars.add(car);
             car.setPosition(position);
-            car.setSpeed(car.decide(distance_ahead(position)));
             position_sort();
             return true;
         }
