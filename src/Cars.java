@@ -53,7 +53,7 @@ public class Cars implements Runnable{
 		@param distance the distance ahead of car
 		@return the expect speed pursuant to the distance*/
 	public int decide( int distance ){
-		return (distance-getAccerleration())/2 > getMax_speed() ? getMax_speed() : (int)(distance-getAccerleration())/2;
+		return (distance-2*getAccerleration()) > 2*getMax_speed() ? getMax_speed() : (int)(distance-2*getAccerleration())/2;
 	}
 
 	/** Decide its decision based on the distance ahead
@@ -66,8 +66,8 @@ public class Cars implements Runnable{
         int distance = highway.getLane(lane_id[0]).distance_ahead(getPosition());
 		int tmp = decide(distance);
 
-        if( tmp > speed+getAccerleration() ) accerleration += 0.2;
-        else if( tmp < speed+getAccerleration() )accerleration -= (speed - tmp);
+        if( tmp > speed+getAccerleration() ) accerleration += 0.1;
+        else if( tmp < speed+getAccerleration() )accerleration -= (speed - tmp)/2;
 	}
 
 	/** Print the current state of this Car */
@@ -121,10 +121,6 @@ public class Cars implements Runnable{
         return img[speed*3/getMax_speed()];
     }
 
-    void setSpeed(int decide) {
-        speed = decide;
-    }
-
     /**
      * @return the position
      */
@@ -150,7 +146,7 @@ public class Cars implements Runnable{
      * @param max_speed the max_speed to set
      */
     public void setMax_speed() {
-        max_speed = 8+2*lane_id[0];
+        max_speed = (int)((Math.random()+1)+4)*(lane_id[0]+1);
     }
 
     /**

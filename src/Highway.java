@@ -106,7 +106,7 @@ public class Highway extends JPanel{
         if(lane_id >= getLaneNum() || lane_id < 0) return false;
         
         int origin_lane = car.lane_id[0];
-        if(car.begin < changeLaneDuration || car.getSpeed() < car.getMax_speed()) return false;
+        if(car.begin < changeLaneDuration*2 || car.getSpeed() < car.getMax_speed()) return false;
         if(car.getAccerleration() < 0) return false;
         if(getLane(lane_id).car_join(car, car.getPosition()) == false) return false;
         if(getLane(car.lane_id[0]).car_leave(car) == false){

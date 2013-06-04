@@ -22,7 +22,12 @@ public class CarSimulationJApplet extends JApplet {
     public void init() {
         String []option = {"1", "2", "3"};
         String choice = (String) JOptionPane.showInputDialog(this, "Choose Lane Number", "CarSimulation", JOptionPane.PLAIN_MESSAGE, null, option, "3");
-        lane_num = Integer.parseInt(choice);
+        try{
+            lane_num = Integer.parseInt(choice);
+        }catch(Exception e){
+            e.printStackTrace();
+            System.exit(1);
+        }
 
         for(int i=0; i<4; i++)
             carImage[i] = MyUtil.getImage(String.format("img/car%d.png", i));
