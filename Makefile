@@ -11,9 +11,9 @@ compile:
 	@echo Main-Class: CarSimulationJFrame > manifest.mf
 	jar cvfm hw5.jar manifest.mf -C class . 
 
-applet:
+applet: compile
 	echo "<applet code='CarSimulationJApplet.class' archive='hw5.jar' width='800' height='600'></applet>" > index.html
 	appletviewer index.html
 
-run:
+run: compile
 	java -jar hw5.jar
