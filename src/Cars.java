@@ -53,7 +53,10 @@ public class Cars implements Runnable{
 		@param distance the distance ahead of car
 		@return the expect speed pursuant to the distance*/
 	public int decide( int distance ){
-		return (distance-2*getAccerleration()) > 2*getMax_speed() ? getMax_speed() : (int)(distance-2*getAccerleration())/2;
+        if(distance < 10*(speed + getAccerleration()))
+            return (int)(distance - 10*(speed + getAccerleration()));
+        else return getMax_speed();
+//		return (distance-2*getAccerleration()) > 2*getMax_speed() ? getMax_speed() : (int)(distance-2*getAccerleration())/2;
 	}
 
 	/** Decide its decision based on the distance ahead
@@ -66,8 +69,15 @@ public class Cars implements Runnable{
         int distance = highway.getLane(lane_id[0]).distance_ahead(getPosition());
 		int tmp = decide(distance);
 
-        if( tmp > speed+getAccerleration() ) accerleration += 0.1;
-        else if( tmp < speed+getAccerleration() )accerleration -= (speed - tmp)/2;
+        if( tmp > speed+getAccerleration() ){
+            if(accerleration < 0) accerleration = 0;
+            accerleration += 0.1;
+        }
+        else if( tmp < speed+getAccerleration() )
+             accerleration -= ((double)(speed-tmp))/10;
+        
+        if(accerleration > 1.5) accerleration = 1.5;
+        else if(accerleration < -1.5) accerleration = -1;
 	}
 
 	/** Print the current state of this Car */
@@ -118,7 +128,7 @@ public class Cars implements Runnable{
     }
 
     Image show() {
-        return img[speed*3/getMax_speed()];
+        return speed > getMax_speed() ? img[3] : img[speed*3/getMax_speed()];
     }
 
     /**
@@ -146,7 +156,8 @@ public class Cars implements Runnable{
      * @param max_speed the max_speed to set
      */
     public void setMax_speed() {
-        max_speed = (int)((Math.random()+1)+4)*(lane_id[0]+1);
+        max_speed = 2*(lane_id[0]) + (int)(Math.random()+4) + getID()%3;
+        // max_speed = (int)(Math.random()+(3-lane_id[0]))*2*(lane_id[0]+1);
     }
 
     /**
@@ -154,5 +165,9 @@ public class Cars implements Runnable{
      */
     public double getAccerleration() {
         return accerleration;
+    }
+
+    void setSpeed(int decide) {
+        speed = decide;
     }
 }

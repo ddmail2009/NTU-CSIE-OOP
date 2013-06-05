@@ -108,7 +108,7 @@ public class CarSimulationJApplet extends JApplet {
                         highway.car_join(new Cars(highway, carImage), 0, 0);
                     if(count%2 == 0 && Math.random()*100 < 5)
                         highway.car_join(new Cars(highway, carImage), 0, 1);
-                    if(count%1 == 0 && Math.random()*100 < 10)
+                    if(count%1 == 0 && Math.random()*100 < 1)
                         highway.car_join(new Cars(highway, carImage), 0, 2);
                 }
 

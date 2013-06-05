@@ -30,9 +30,12 @@ public class Lane{
     */
     synchronized public boolean car_join( Cars car, int position ){    
         if( car.decide(distance_ahead(position)) > 0 ){
+//            if(car.begin == 0) 
+//                car.setSpeed(car.decide(distance_ahead(position)));
+            
             for(int i=0; i<car.getSpeed()*3+48; i++)
                 if(position_search(position-i) != -1)return false;
-            for(int i=0; i<48; i++)
+            for(int i=0; i<car.getSpeed()*2+48; i++)
                 if(position_search(position+i) != -1)return false;
             
             cars.add(car);
