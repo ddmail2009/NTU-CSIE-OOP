@@ -22,6 +22,7 @@ build.xml
 hw5.pdf
 manifest.mf
 nbproject/
+*.jar
 
 
 
