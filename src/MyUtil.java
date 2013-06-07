@@ -8,21 +8,21 @@ import javax.imageio.ImageIO;
  * General Utility Used in this project
  */
 public class MyUtil{
-    private MyUtil(){}
-    
-    /**
-     * Get the BufferedImage
-     * @param file the relative path to the file
-     * @return the BufferedImage
-     */
-    public static BufferedImage getImage(String file){
-        BufferedImage img = null;
-        try {
-            img = ImageIO.read(MyUtil.class.getResource(file));
-        } catch (IOException ex) {
-            System.err.println(file);
-            ex.printStackTrace();
-        }   
-        return img;
-    }
+	private MyUtil(){}
+	
+	/**
+	 * Get the BufferedImage
+	 * @param file the relative path to the file
+	 * @return the BufferedImage
+	 */
+	public static BufferedImage getImage(String file){
+		BufferedImage img = null;
+		try {
+			img = ImageIO.read(MyUtil.class.getResource(file));
+		} catch (IOException ex) {
+			System.err.println(file);
+			ex.printStackTrace();
+		}   
+		return img;
+	}
 }
