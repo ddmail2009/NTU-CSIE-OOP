@@ -1,0 +1,60 @@
+{
+	"Normal3": {
+		"Name": "Forest",
+		"Map":"img/background/background1.png",
+		"Solid":"img/background/background1[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/FirstMap.txt", "img": "img/background/background12FirstMap.png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "img": "img/background/background1_trigger2.png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerDialog"},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerGrab", "Config": {"img": "img/background/background1[grab].png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 400, "y": 730},
+				"ViewPoint": {"x": 0, "y": 430}
+			},{
+				"From": "LittleGrilTrap", 
+				"Player": {"x": 400, "y": 730},
+				"ViewPoint": {"x": 0, "y": 430}
+			},{
+				"From": "Bridge", 
+				"Player": {"x": 3800, "y": 730},
+				"ViewPoint": {"x": 3400, "y": 300}
+			}
+		],
+		"NPC":[
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 560, "y": 730}, "Name": "LittleGirl", "Group": "NPC"},
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 1000, "y": 730}, "Name": "Shopper", "Group": "NPC"},
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 200, "y": 730}, "Name": "Pig1", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 1400, "y": 730}, "Name": "Pig2", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 1200, "y": 730}, "Name": "Pig3", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 800, "y": 730}, "Name": "Pig4", "Group": "Monster"}
+		]
+	},
+	"Default": {
+		"Name": "Forest",
+		"Map":"img/background/background1.png",
+		"Solid":"img/background/background1[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "img": "img/background/background1_trigger2.png"}}
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerGrab", "Config": {"img": "img/background/background1[grab].png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 400, "y": 730},
+				"ViewPoint": {"x": 0, "y": 430}
+			},{
+				"From": "Bridge", 
+				"Player": {"x": 3800, "y": 730},
+				"ViewPoint": {"x": 3400, "y": 300}
+			}
+		],
+		"NPC":[
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 560, "y": 730}, "Name": "LittleGirl", "Group": "NPC"},
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 1000, "y": 730}, "Name": "Shopper", "Group": "NPC"}
+		]
+	}
+}

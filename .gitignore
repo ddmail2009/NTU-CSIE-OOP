@@ -1,0 +1,46 @@
+build
+lib
+nbproject
+.dropbox
+build.xml
+manifest.mf
+WorkDirectory.bat
+desktop.ini
+dist
+JLayer.jar
+json-simple-1.1.1.jar
+class/LWC
+class/config
+class/img
+class/music
+META-INF
+save/
+
+# OS generated files #
+######################
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Icon?
+ehthumbs.db
+Thumbs.db
+
+# Packages #
+############
+# it's better to unpack these files and commit the raw source
+# git has its own built in compression methods
+*.7z
+*.dmg
+*.gz
+*.iso
+*.rar
+*.tar
+*.zip
+
+# Logs and databases #
+######################
+*.log
+*.sql
+*.sqlite

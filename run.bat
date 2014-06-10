@@ -1,0 +1,1 @@
+java -Xms1024m -cp class LWC.pkgfinal.LWC_Main

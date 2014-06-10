@@ -1,0 +1,67 @@
+{
+	"DemonUp": {
+		"Name": "LittleGrilTrap",
+		"Map":"img/background/FirstMap.png",
+		"Solid":"img/background/FirstMap[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerGrab", "Config": {"img": "img/background/FirstMap[grab].png"}}
+		],
+		"EnterPoint": [{
+				"From": "", 
+				"Player": {"x": 70, "y": 866},
+				"ViewPoint": {"x": 0, "y": 430}
+			},{
+				"From": "Bridge", 
+				"Player": {"x": 1100, "y": 830},
+				"ViewPoint": {"x": 500, "y": 400}
+			}
+		],
+		"NPC":[
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC_Mary", "EnterPoint": {"x": 1255, "y": 129},"Name": "Mary", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 620, "y": 590}, "Name": "LittleGirl", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 850, "y": 480}, "Name": "Hinter1", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 407, "y": 210}, "Name": "Monster1", "Group": "Monster"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 834, "y": 210}, "Name": "Monster2", "Group": "Monster"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 1200, "y": 170}, "Name": "Monster3", "Group": "Monster"},
+
+
+            {"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 49, "y": 370}, "Name": "Monster4", "Group": "Monster"}
+		]
+	},
+	"Default": {
+		"Name": "LittleGrilTrap",
+		"Map":"img/background/FirstMap.png",
+		"Solid":"img/background/FirstMap[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerGrab", "Config": {"img": "img/background/FirstMap[grab].png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/AnimeMap_After.txt", "img": "img/background/FirstMap2AnimeMap.png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "img": "img/background/FirstMap2Forest.png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 70, "y": 866},
+				"ViewPoint": {"x": 0, "y": 430}
+			},{
+				"From": "Bridge", 
+				"Player": {"x": 1100, "y": 830},
+				"ViewPoint": {"x": 500, "y": 400}
+			}
+		],
+		"NPC":[
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 620, "y": 590}, "Name": "LittleGirl", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 1153, "y": 1361},"Name": "Li", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC_Mary", "EnterPoint": {"x": 1239, "y": 329},"Name": "Mary", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 850, "y": 480}, "Name": "Hinter1", "Group": "NPC"}
+		]
+	}
+}

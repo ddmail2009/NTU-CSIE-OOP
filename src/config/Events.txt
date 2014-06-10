@@ -1,0 +1,126 @@
+{
+	"Normal": [{
+        "Next": "DemonUp",
+        "Type": "Delete",
+        "ClassType": "LWC.pkgfinal.Overlay.LWC_StartingAnime",
+        "Field": {},
+		"Action": {	
+            "Obj": [
+                {"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 504, "y": 316}, "Name": "Woman", "Group": "NPC"}
+            ]
+        }
+    }],
+    "DemonUp": [{
+            "Next": "attack2"
+            "Type": "Delete",
+            "ClassType": "LWC.pkgfinal.Object.LWC_Monster",
+            "Field": {"name": "Monster1"}
+            "Action": {}
+		},{
+            "Next": "attack2"
+            "Type": "Delete",
+            "ClassType": "LWC.pkgfinal.Object.LWC_Monster",
+            "Field": {"name": "Monster2"}
+            "Action": {}
+		},{
+            "Next": "attack2"
+            "Type": "Delete",
+            "ClassType": "LWC.pkgfinal.Object.LWC_Monster",
+            "Field": {"name": "Monster3"}
+            "Action": {}
+        },{
+            "Next": "attack2"
+            "Type": "Delete",
+            "ClassType": "LWC.pkgfinal.Object.LWC_Monster",
+            "Field": {"name": "Monster4"}
+            "Action": {}
+		}
+    ],
+    "attack2": [{
+            "Next": "attack3",
+            "Refer": "DemonUp",
+            "ReferIndex": 0
+        },{
+            "Next": "attack3",
+            "Refer": "DemonUp",
+            "ReferIndex": 1
+        },{
+            "Next": "attack3",
+            "Refer": "DemonUp",
+            "ReferIndex": 2
+        },{
+            "Next": "attack3",
+            "Refer": "DemonUp",
+            "ReferIndex": 3
+        }
+    ],
+    "attack3": [{
+            "Next": "attack4",
+            "Refer": "DemonUp",
+            "ReferIndex": 0
+        },{
+            "Next": "attack4",
+            "Refer": "DemonUp",
+            "ReferIndex": 1
+        },{
+            "Next": "attack4",
+            "Refer": "DemonUp",
+            "ReferIndex": 2
+        },{
+            "Next": "attack4",
+            "Refer": "DemonUp",
+            "ReferIndex": 3
+        }],
+    "attack4": [{
+            "Next": "Normal2",
+            "Refer": "DemonUp",
+            "ReferIndex": 0
+        },{
+            "Next": "Normal2",
+            "Refer": "DemonUp",
+            "ReferIndex": 1
+        },{
+            "Next": "Normal2",
+            "Refer": "DemonUp",
+            "ReferIndex": 2
+        },{
+            "Next": "Normal2",
+            "Refer": "DemonUp",
+            "ReferIndex": 3
+        }],
+	"Normal2": [{
+        "Next": "Normal3",
+        "Type": "Add"
+        "ClassType": "LWC.pkgfinal.Overlay.LWC_InterfaceNPCMsg",
+        "Field": {"name": "LittleGirl"},
+		"Action": {	
+            "Trigger": [
+                {"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "img": "img/background/FirstMap2Forest.png"}},
+                {"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/AnimeMap_After.txt", "img": "img/background/FirstMap2AnimeMap.png"}}
+            ]
+        }
+	}],
+    "Normal3": [{
+        "Next": "Final",
+        "Type": "Add",
+        "ClassType": "LWC.pkgfinal.Object.LWC_Boss",
+        "Field": {"name": "Boss"},
+        "Action": {
+            "PauseInterface": [
+                {"Type": "LWC.pkgfinal.Overlay.LWC_InterfaceNPCMsg", "Config": {"name": "Boss", "condition": "Normal"}}
+            ]
+        }
+	}],
+    "Final": [{
+        "Next": "Final",
+        "Type": "Delete",
+        "ClassType": "LWC.pkgfinal.Object.LWC_Boss",
+        "Field": {"dead": "Boss"},
+        "Action": {
+            "PauseInterface": [
+                {"Type": "LWC.pkgfinal.Overlay.LWC_InterfaceEndScene"},
+                {"Type": "LWC.pkgfinal.Overlay.LWC_InterfaceNPCMsg", "Config": {"name": "Boss", "condition": "Final"}}
+            ]
+        }
+    }]
+}

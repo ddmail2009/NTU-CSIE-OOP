@@ -1,0 +1,39 @@
+{
+	"Normal": {
+		"Name": "Opening",
+		"Map":"img/background/backgoundimage.png",
+		"Solid":"img/background/backgoundimage[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type":"LWC.pkgfinal.Overlay.LWC_TriggerAddPauseInterface", "Config": {"rect": {"x": 340, "y": 180, "width": 100, "height": 250}, "Type": "LWC.pkgfinal.Overlay.LWC_StartingAnime"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 0, "y": 300},
+				"ViewPoint": {"x": 0, "y": 0}
+			}
+		],
+		"NPC":[]
+	},
+	"Default": {
+		"Name": "Opening",
+		"Map":"img/background/backgoundimage.png",
+		"Solid":"img/background/backgoundimage[s].png",
+		"ForeGround": "",
+		"Trigger":[
+	        {"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/FirstMap.txt", "img": "img/background/AnimeMap2FirstMap.png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 0, "y": 300},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+	            "From": "LittleGrilTrap", 
+				"Player": {"x": 700, "y": 300},
+				"ViewPoint": {"x": 0, "y": 0}
+	        }
+		],
+		"NPC":[
+		]
+	}
+}

@@ -1,0 +1,62 @@
+{
+	"Normal": {
+		"Name": "OpeningAfter",
+		"Map":"img/background/backgoundimageAfter.png",
+		"Solid":"img/background/backgoundimage[s].png",
+		"ForeGround": "",
+		"Trigger":[
+	        {"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/FirstMap.txt", "img": "img/background/AnimeMap2FirstMap.png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 0, "y": 0},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+				"From": "Opening", 
+				"Player": {"x": 340, "y": 280},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+				"From": "OpeningAfter", 
+				"Player": {"x": 340, "y": 280},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+	            "From": "LittleGrilTrap", 
+				"Player": {"x": 700, "y": 300},
+				"ViewPoint": {"x": 0, "y": 0}
+	        }
+		],
+		"NPC":[
+		]
+	},
+	"Default": {
+		"Name": "OpeningAfter",
+		"Map":"img/background/backgoundimageAfter.png",
+		"Solid":"img/background/backgoundimage[s].png",
+		"ForeGround": "",
+		"Trigger":[
+	        {"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/FirstMap.txt", "img": "img/background/AnimeMap2FirstMap.png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 0, "y": 0},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+				"From": "Opening", 
+				"Player": {"x": 340, "y": 280},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+				"From": "OpeningAfter", 
+				"Player": {"x": 340, "y": 280},
+				"ViewPoint": {"x": 0, "y": 0}
+			}, {
+	            "From": "LittleGrilTrap", 
+				"Player": {"x": 700, "y": 300},
+				"ViewPoint": {"x": 0, "y": 0}
+	        }
+		],
+		"NPC":[
+            {"Type": "LWC.pkgfinal.Object.LWC_NPC_Dragon", "EnterPoint": {"x": 0, "y": 273},"Name": "Dragon", "Group": "NPC"},
+            {"Type": "LWC.pkgfinal.Object.LWC_NPC", "EnterPoint": {"x": 504, "y": 316}, "Name": "Woman", "Group": "NPC"}
+		]
+	}
+}

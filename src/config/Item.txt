@@ -1,0 +1,22 @@
+{
+	"Axe":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":4, "Name":"斧頭","Description":"斧頭, 攻擊力:4", "Path":"img/weapon/Axe.png"}
+	"BasicWeapon":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":1, "Name":"基本武器","Description":"廢物一個, Attack: 1", "Path":"img/weapon/basicWeapon.png"}
+	"MaceWeapon":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":7, "Name":"槌子","Description":"超猛槌, 攻擊力:7", "Path":"img/weapon/mace.png"}
+	"FinalWeapon":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":10, "Name":"嗜血者","Description":"據說會嗜自己HP!?, 攻擊力: 10", "Path":"img/weapon/finalWeapon.png"}
+	"SecondWeapon":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":3, "Name":"魔法杖","Description":"中二病患者送的魔法杖, 攻擊力: 3", "Path":"img/weapon/magic_wand.png"}
+	"Sword":
+		{"type":"LWC.pkgfinal.Item.LWC_BaseWeapon","Damage":2, "Name":"短劍","Description":"殘破的短劍, 攻擊力: 2", "Path":"img/weapon/sword.png"}
+	"BlueWater":
+		{"type":"LWC.pkgfinal.Item.LWC_RestoreItem","MP":15, "Name":"爛水","Description":"補魔10滴，夠爛吧~", "Path":"img/eatable/bluewater.png"}
+	"RedWater":
+		{"type":"LWC.pkgfinal.Item.LWC_RestoreItem","HP":30, "Name":"番茄汁?","Description":"回血神器，但怎看起來像血?", "Path":"img/eatable/redwater.png"}
+	"Pie":
+		{"type":"LWC.pkgfinal.Item.LWC_RestoreItem","HP":10, "Name":"甜甜派","Description":"不知回幾滴血，據說回血30滴!?", "Path":"img/eatable/pie.png"}
+	"Chicken":
+		{"type":"LWC.pkgfinal.Item.LWC_RestoreItem","HP":100, "Name":"小展哥","Description":"laisky 補血?", "Path":"img/eatable/chicken.png"}
+}

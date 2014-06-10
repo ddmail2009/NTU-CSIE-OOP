@@ -1,0 +1,50 @@
+{
+	"Default": {
+		"Name": "Bridge",
+		"Map":"img/background/background2After.png",
+		"Solid":"img/background/background2[s].png",
+		"ForeGround": "img/background/background2After[f].png",
+		"Trigger":[
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", 
+				"Config": {"To": "config/FirstMap.txt", "img": "img/background/background2_trigger.png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerMapChange", 
+				"Config": {"To": "config/Map3.txt", "img": "img/background/background2_to_templeOfTime.png"}},
+			{"Type": "LWC.pkgfinal.Overlay.LWC_TriggerGrab",
+				"Config": {"img": "img/background/background2[grab].png"}}
+		],
+		"EnterPoint": [ {
+				"From": "", 
+				"Player": {"x": 520, "y": 1450},
+				"ViewPoint": {"x": 200, "y": 1080}
+			},{
+				"From": "Forest", 
+				"Player": {"x": 520, "y": 1450},
+				"ViewPoint": {"x": 200, "y": 1080}
+			},{
+				"From": "LittleGrilTrap", 
+				"Player": {"x": 520, "y": 1450},
+				"ViewPoint": {"x": 200, "y": 1080}
+			},{
+				"From": "TempleOfTime",
+				"Player": {"x": 3300, "y": 650},
+				"ViewPoint": {"x": 2700, "y": 250}
+			}
+		],
+		"NPC":[
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC_Li", "EnterPoint": {"x": 1153, "y": 1361},"Name": "Li", "Group": "NPC"},
+			{"Type": "LWC.pkgfinal.Object.LWC_NPC_Given", "EnterPoint": {"x": 1521, "y": 241},"Name": "Angel", "Group": "NPC"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_FlyMonster", "EnterPoint": {"x": 1470, "y": 730}, "Name": "FlyMonster1", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_FlyMonster", "EnterPoint": {"x": 2650, "y": 870}, "Name": "FlyMonster2", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_FlyMonster", "EnterPoint": {"x": 3011, "y": 283}, "Name": "FlyMonster3", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_FlyMonster", "EnterPoint": {"x": 2900, "y": 1100}, "Name": "FlyMonster4", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_FlyMonster", "EnterPoint": {"x": 1959, "y": 591}, "Name": "FlyMonster5", "Group": "Monster"},
+
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 1070, "y": 700}, "Name": "Pig5", "Group": "Monster"},
+			{"Type": "LWC.pkgfinal.Object.LWC_Monster", "EnterPoint": {"x": 1565, "y": 1357}, "Name": "Pig6", "Group": "Monster"}
+		],
+		"Obj": [
+			{"Type": "LWC.pkgfinal.Object.LWC_ObjectPortal", "EnterPoint": {"x": 3450, "y": 610}}
+		]
+	}
+}

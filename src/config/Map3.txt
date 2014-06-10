@@ -1,0 +1,55 @@
+{
+	"Normal3": {
+		"Name": "TempleOfTime",
+		"Map":"img/background/templeOfTime.png",
+		"Solid":"img/background/templeOfTime[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "rect": {"x": 1300, "y": 300, "width": 200, "height": 250}}}
+		],
+		"EnterPoint": [ {
+				"From": "Bridge", 
+				"Player": {"x": 1200, "y": 480},
+				"ViewPoint": {"x": 500, "y": 80}
+			}
+		],
+		"NPC":[
+            {"Type": "LWC.pkgfinal.Object.LWC_Boss", "EnterPoint": {"x": 600, "y": 100}, "Name": "Boss", "Group": "Monster"}
+		]
+	},
+	"Final": {
+		"Name": "TempleOfTime",
+		"Map":"img/background/templeOfTime.png",
+		"Solid":"img/background/templeOfTime[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "rect": {"x": 1300, "y": 300, "width": 200, "height": 250}}}
+		],
+		"EnterPoint": [ {
+				"From": "Bridge", 
+				"Player": {"x": 1200, "y": 480},
+				"ViewPoint": {"x": 500, "y": 80}
+			}
+		],
+		"NPC":[
+            {"Type": "LWC.pkgfinal.Object.LWC_Boss", "EnterPoint": {"x": 600, "y": 100}, "Name": "Boss", "Group": "Monster"}
+		]
+	}
+	"Default": {
+		"Name": "TempleOfTime",
+		"Map":"img/background/templeOfTime.png",
+		"Solid":"img/background/templeOfTime[s].png",
+		"ForeGround": "",
+		"Trigger":[
+			{"Type":"LWC.pkgfinal.Overlay.LWC_TriggerMapChange", "Config": {"To": "config/Map2.txt", "rect": {"x": 1300, "y": 300, "width": 200, "height": 250}}}
+		],
+		"EnterPoint": [ {
+				"From": "Bridge", 
+				"Player": {"x": 1200, "y": 480},
+				"ViewPoint": {"x": 500, "y": 80}
+			}
+		],
+		"NPC":[
+		]
+	}
+}
