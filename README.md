@@ -3,6 +3,8 @@ Object Oriented Programming
 
 Homework3!!! POOBBS
 --------------------------------------
+Using OOP techniques for forum system
+
 
 **Run**:
 
